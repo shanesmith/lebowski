@@ -1,0 +1,9 @@
+
+# https://developer.themoviedb.org/reference/intro/getting-started
+
+https://api.themoviedb.org/3
+Authorization: Bearer $TMDB_ACCESS_TOKEN
+--
+
+--
+GET /movie/115/watch/providers
