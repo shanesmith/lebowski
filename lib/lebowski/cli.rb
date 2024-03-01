@@ -79,7 +79,7 @@ module Lebowski
             "movies" => movies.sort_by { |m| m["other_providers"].size },
           }
         end
-        .sort_by { |elem| elem["movies"].size }
+        .sort_by { |elem| elem["movies"].filter { |m| m["other_providers"].empty? }.size }
         .reverse
 
       puts result.to_json
