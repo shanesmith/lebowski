@@ -4,12 +4,17 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
+  <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@5.8.55/css/materialdesignicons.min.css">
   <link rel="stylesheet" href="https://unpkg.com/buefy/dist/buefy.min.css">
   <style>
     .title {
       vertical-align: middle;
       font-size: 5rem;
+
+      font-family: "Abril Fatface", serif;
+      font-weight: 400;
+      font-style: normal;
     }
 
     .title img {
@@ -23,11 +28,9 @@
   <div id="app">
 
     <section class="section">
-      <div class="container">
-        <h1 class="title">
-          <img src="the_dude.png" />
-          Lebowski
-        </h1>
+      <div class="container is-flex is-align-items-center">
+        <img src="the_dude.png" />
+        <h1 class="title ml-5">Lebowski</h1>
       </div>
     </section>
 
@@ -36,32 +39,36 @@
         <b-collapse
           class="card"
           animation="slide"
-          v-for="(movies, provider) in list"
-          :key="provider"
-          :open="isOpen == provider"
-          @open="isOpen = provider">
+          v-for="provider in list"
+          :key="provider.provider"
+          :open="isOpen == provider.provider"
+          @open="isOpen = provider.provider">
           <template #trigger="props">
             <div
               class="card-header"
               role="button">
               <p class="card-header-title">
-                {{provider}}
-                <span class="tag is-rounded">{{movies.length}}</span>
+                {{provider.provider}}
+                <span class="tag is-rounded ml-1">{{provider.movies.filter(m => m["other_providers"].length == 0).length}} / {{provider.movies.length}}</span>
               </p>
               <a class="card-header-icon">
                 <b-icon :icon="props.open ? 'menu-up' : 'menu-down'"></b-icon>
               </a>
             </div>
           </template>
-          <div class="card-content">
-            <div class="content">
-              <ul class="mt-0">
-                <li v-for="movie in movies">
-                  <a :href="movie.link" target="_blank">{{movie.title}} ({{movie.year}})</a>
-                  <span class="tag is-rounded">{{movie.weight}}</span>
-                </li>
-              </ul>
-            </div>
+          <div class="card-content content">
+            <ul class="mt-0">
+              <li v-for="movie in provider.movies">
+                <a :href="movie.link" target="_blank">{{movie.title}} ({{movie.year}})</a>
+                <b-tooltip 
+                  v-if="movie.other_providers.length != 0"
+                  :label="movie.other_providers.join(' / ')" 
+                  position="is-right"
+                  type="is-light">
+                  <span class="tag is-rounded">{{movie.other_providers.length}}</span>
+                </b-tooltip>
+              </li>
+            </ul>
           </div>
         </b-collapse>
       </div>
