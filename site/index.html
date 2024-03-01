@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@5.8.55/css/materialdesignicons.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/buefy/dist/buefy.min.css">
+  <style>
+    .title {
+      vertical-align: middle;
+      font-size: 5rem;
+    }
+
+    .title img {
+      vertical-align: middle;
+      margin-right: 40px;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="app">
+
+    <section class="section">
+      <div class="container">
+        <h1 class="title">
+          <img src="the_dude.png" />
+          Lebowski
+        </h1>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <b-collapse
+          class="card"
+          animation="slide"
+          v-for="(movies, provider) in list"
+          :key="provider"
+          :open="isOpen == provider"
+          @open="isOpen = provider">
+          <template #trigger="props">
+            <div
+              class="card-header"
+              role="button">
+              <p class="card-header-title">
+                {{provider}}
+                <span class="tag is-rounded">{{movies.length}}</span>
+              </p>
+              <a class="card-header-icon">
+                <b-icon :icon="props.open ? 'menu-up' : 'menu-down'"></b-icon>
+              </a>
+            </div>
+          </template>
+          <div class="card-content">
+            <div class="content">
+              <ul class="mt-0">
+                <li v-for="movie in movies">
+                  <a :href="movie.link" target="_blank">{{movie.title}} ({{movie.year}})</a>
+                  <span class="tag is-rounded">{{movie.weight}}</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </b-collapse>
+      </div>
+    </section>
+
+  </div>
+
+  <script src="https://unpkg.com/vue@2"></script>
+  <script src="https://unpkg.com/buefy/dist/buefy.min.js"></script>
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        list: {},
+        isOpen: ""
+      },
+      created: function() {
+        fetch("./data.json")
+          .then(response => response.json())
+          .then(json => this.list = json)
+      }
+    })
+  </script>
+</body>
+</html>
