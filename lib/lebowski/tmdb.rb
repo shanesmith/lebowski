@@ -44,8 +44,8 @@ module Lebowski
           conn.request :authorization, 'Bearer', AccessToken
           conn.request :json
 
-          conn.response :raise_error
           conn.response :json
+          conn.response :raise_error
         end
       end
     end

@@ -1,0 +1,39 @@
+name: Github Pages
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+
+      - shell: bash
+        env:
+          TRAKT_CLIENT_ID: ${{secrets.TRAKT_CLIENT_ID}}
+          TRAKT_CLIENT_SECRET: ${{secrets.TRAKT_CLIENT_SECRET}}
+          TRAKT_ACCESS_TOKEN: ${{secrets.TRAKT_ACCESS_TOKEN}}
+          TMDB_ACCESS_TOKEN: ${{secrets.TMDB_ACCESS_TOKEN}}
+        run: bundle exec bin/lebowski tmdb > site/data.json
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site/
+
+  deploy:
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/deploy-pages@v4

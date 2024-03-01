@@ -36,6 +36,7 @@ module Lebowski
           conn.request :json
 
           conn.response :json
+          conn.response :raise_error
         end
       end
     end

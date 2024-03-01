@@ -1,5 +1,4 @@
 require "thor"
-require 'pry'
 
 class Error < Thor::Error; end
 
@@ -37,6 +36,8 @@ module Lebowski
     desc 'tmdb', 'TMDB'
     def tmdb
       wl = Lebowski::Trakt.wishlist
+
+      # TODO parrallelize
       wl.each_with_index do |movie,index|
         STDERR.print "#{index},"
         STDERR.flush
