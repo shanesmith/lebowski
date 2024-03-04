@@ -21,6 +21,10 @@ module Lebowski
       "iciTouTV",
     ]
 
+    AdsAllow = [
+      "CBC Gem",
+    ]
+
     desc 'login', 'Login with Google'
     def login
       puts "LOGIN!"
@@ -57,11 +61,17 @@ module Lebowski
       end
 
       result = wl.each_with_object({}) do |movie, providers|
-        list = movie
-          .dig("providers", "flatrate")
-          &.reject { |p| Ignore.include?(p["provider_name"]) }
+        list = []
 
-        next if list.nil? || list.empty?
+        list += (movie.dig("providers", "flatrate") || [])
+          .each { |p| p["provider_name"].strip! }
+          .reject { |p| Ignore.include?(p["provider_name"]) }
+
+        list += (movie.dig("providers", "ads") || [])
+          .each { |p| p["provider_name"].strip! }
+          .select { |p| AdsAllow.include?(p["provider_name"]) }
+
+        next if list.empty?
 
         list.each do |p|
           name = p["provider_name"]
