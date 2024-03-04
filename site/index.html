@@ -110,7 +110,7 @@
               <li v-for="movie in provider.movies">
                 <a :href="movie.link" target="_blank">
                   {{movie.title}}
-                  <span class="has-text-grey has-text-weight-light">({{movie.year}})</span>
+                  <span class="has-text-grey has-text-weight-light is-size-7">({{movie.year}})</span>
                 </a>
                 <b-tooltip
                   v-if="movie.other_providers.length != 0"
