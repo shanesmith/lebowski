@@ -91,7 +91,10 @@
           <div class="card-content content">
             <ul class="mt-0 movies">
               <li v-for="movie in provider.movies">
-                <a :href="movie.link" target="_blank">{{movie.title}} ({{movie.year}})</a>
+                <a :href="movie.link" target="_blank">
+                  {{movie.title}}
+                  <span class="has-text-grey has-text-weight-light">({{movie.year}})</span>
+                </a>
                 <b-tooltip
                   v-if="movie.other_providers.length != 0"
                   :label="movie.other_providers.join(' / ')"
