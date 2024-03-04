@@ -49,7 +49,11 @@
               role="button">
               <p class="card-header-title">
                 {{provider.provider}}
-                <span class="tag is-rounded ml-1">{{provider.movies.filter(m => m["other_providers"].length == 0).length}} / {{provider.movies.length}}</span>
+                <span class="tag is-rounded ml-1">
+                  <span>{{provider.movies.filter(m => m["other_providers"].length == 0).length}}</span>
+                  <span class="ml-1 has-text-weight-normal has-text-grey-light">|</span>
+                  <span class="ml-1 has-text-weight-normal has-text-grey">{{provider.movies.length}}</span>
+                </span>
               </p>
               <a class="card-header-icon">
                 <b-icon :icon="props.open ? 'menu-up' : 'menu-down'"></b-icon>
