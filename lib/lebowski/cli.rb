@@ -6,6 +6,7 @@ class Error < Thor::Error; end
 # - Login
 # - Update summary
 # - Parralelize TMDB calls
+# - Check US availability?
 
 module Lebowski
   class Cli < Thor
@@ -93,6 +94,12 @@ module Lebowski
         STDERR.puts (movie.dig("providers", "flatrate") || []).map { |p| p["provider_name"] }.join(" / ")
       end
 
+      other_result = {
+        "rent" => [],
+        "buy" => [],
+        "unavailable" => [],
+      }
+
       result = wl.each_with_object({}) do |movie, providers|
         list = []
 
@@ -104,7 +111,20 @@ module Lebowski
           .each { |p| p["provider_name"].strip! }
           .select { |p| AdsAllow.include?(p["provider_name"]) }
 
-        next if list.empty?
+        item = {
+          **movie["movie"],
+          "link" => "https://www.themoviedb.org/movie/#{movie.dig("movie", "ids", "tmdb")}/watch?locale=CA",
+        }
+
+        if list.empty?
+          if movie.dig("providers", "rent")
+            other_result["rent"] << item
+          elsif movie.dig("providers", "buy")
+            other_result["buy"] << item
+          else
+            other_result["unavailable"] << item
+          end
+        end
 
         list.each do |p|
           name = p["provider_name"]
@@ -112,8 +132,7 @@ module Lebowski
           providers[name] = [] unless providers.key?(name)
 
           providers[name] << {
-            **movie["movie"],
-            "link" => movie["providers"]["link"],
+            **item,
             "other_providers" => list.map { |p| p["provider_name"] }.reject { |p| p == name },
           }
         end
@@ -150,7 +169,12 @@ module Lebowski
         .sort_by { |elem| elem["movies"].filter { |m| m["other_providers"].empty? }.size }
         .reverse
 
-      puts result.to_json
+      json = {
+        **other_result,
+        "stream" => result,
+      }.to_json
+
+      puts json
     end
   end
 end

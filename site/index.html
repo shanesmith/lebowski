@@ -30,7 +30,10 @@
     <section class="section">
       <div class="container is-flex is-align-items-center">
         <img src="the_dude.png" />
-        <h1 class="title ml-5">Lebowski</h1>
+        <div>
+          <h1 class="title ml-5">Lebowski</h1>
+          <h2 class="subtitle ml-5">Where's the movies, Lebowski?</h2>
+        </div>
       </div>
     </section>
 
@@ -39,7 +42,7 @@
         <b-collapse
           class="card"
           animation="slide"
-          v-for="provider in list"
+          v-for="provider in list.stream"
           :key="provider.provider"
           :open="isOpen == provider.provider"
           @open="isOpen = provider.provider">
@@ -82,6 +85,35 @@
             </ul>
           </div>
         </b-collapse>
+        <b-collapse
+          class="card"
+          animation="slide"
+          v-for="type in otherTypes"
+          v-if="list[type]"
+          :key="type"
+          :open="isOpen == type"
+          @open="isOpen = type">
+          <template #trigger="props">
+            <div
+              class="card-header"
+              role="button">
+              <p class="card-header-title has-text-grey-light">
+                <span class="mr-1 is-capitalized">{{type}}</span>
+                <span class="tag is-rounded mr-1 has-text-grey-light">{{list[type].length}}</span>
+              </p>
+              <a class="card-header-icon">
+                <b-icon :icon="props.open ? 'menu-up' : 'menu-down'"></b-icon>
+              </a>
+            </div>
+          </template>
+          <div class="card-content content">
+            <ul class="mt-0">
+              <li v-for="movie in list[type]">
+                <a :href="movie.link" target="_blank">{{movie.title}} ({{movie.year}})</a>
+              </li>
+            </ul>
+          </div>
+        </b-collapse>
       </div>
     </section>
 
@@ -94,7 +126,8 @@
       el: '#app',
       data: {
         list: {},
-        isOpen: ""
+        isOpen: "",
+        otherTypes: ["rent", "buy", "unavailable"],
       },
       created: function() {
         fetch("./data.json")
