@@ -39,6 +39,22 @@
       flex: 1 1 44%;
       margin-left: 2em;
     }
+
+    .card {
+      border: 1px solid transparent;
+    }
+
+    .card:hover {
+      border-left: 1px solid #959595;
+    }
+
+    .card .card-header {
+      box-shadow: none;
+    }
+
+    .card.opened {
+      border: 1px solid #959595;
+    }
   </style>
 </head>
 <body>
@@ -62,6 +78,7 @@
           animation="slide"
           v-for="provider in list.stream"
           :key="provider.provider"
+          :class="{ opened: isOpen == provider.provider }"
           :open="isOpen == provider.provider"
           @open="isOpen = provider.provider">
           <template #trigger="props">
@@ -112,6 +129,7 @@
           v-for="type in otherTypes"
           v-if="list[type]"
           :key="type"
+          :class="{ opened: isOpen == type }"
           :open="isOpen == type"
           @open="isOpen = type">
           <template #trigger="props">
