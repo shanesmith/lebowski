@@ -17,7 +17,8 @@ module Lebowski
     Ignore = [
       "Netflix basic with Ads",
       "Hoopla",
-      "Club Illico"
+      "Club Illico",
+      "iciTouTV",
     ]
 
     desc 'login', 'Login with Google'
