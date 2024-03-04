@@ -9,17 +9,24 @@
   <link rel="stylesheet" href="https://unpkg.com/buefy/dist/buefy.min.css">
   <style>
     .title {
-      vertical-align: middle;
       font-size: 5rem;
 
       font-family: "Abril Fatface", serif;
-      font-weight: 400;
-      font-style: normal;
+      font-weight: normal;
     }
 
-    .title img {
-      vertical-align: middle;
-      margin-right: 40px;
+    #the_dude {
+      will-change: transform;
+      transition: transform 2s linear;
+    }
+
+    #the_dude:hover {
+      animation: wiggle 0.2s linear infinite alternate;
+    }
+
+    @keyframes wiggle {
+      from { transform: rotate(-15deg); }
+      to { transform: rotate(10deg); }
     }
   </style>
 </head>
@@ -28,8 +35,8 @@
   <div id="app">
 
     <section class="section">
-      <div class="container is-flex is-align-items-center">
-        <img src="the_dude.png" />
+      <div class="container is-max-desktop is-flex is-align-items-center">
+        <img src="the_dude.png" id="the_dude" />
         <div>
           <h1 class="title ml-5">Lebowski</h1>
           <h2 class="subtitle ml-5">Where's the movies, Lebowski?</h2>
@@ -37,8 +44,8 @@
       </div>
     </section>
 
-    <section class="section">
-      <div class="container">
+    <section class="section pt-4">
+      <div class="container is-max-desktop">
         <b-collapse
           class="card"
           animation="slide"
@@ -116,6 +123,15 @@
         </b-collapse>
       </div>
     </section>
+
+    <footer class="footer">
+      <div class="container is-max-desktop">
+        <a href="https://github.com/shanesmith/lebowski" class=" is-flex is-align-items-center is-justify-content-center">
+          <b-icon icon="github" class="mr-2 has-text-black"></b-icon>
+          https://github.com/shanesmith/lebowski
+        </a>
+      </div>
+    </footer>
 
   </div>
 
