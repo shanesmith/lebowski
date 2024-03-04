@@ -4,8 +4,8 @@ class Error < Thor::Error; end
 
 # TODO
 # - Login
-# - Combine channels (Starz, Paramount, etc..)
 # - Update summary
+# - Parralelize TMDB calls
 
 module Lebowski
   class Cli < Thor
@@ -78,7 +78,6 @@ module Lebowski
     def tmdb
       wl = Lebowski::Trakt.wishlist
 
-      # TODO parrallelize
       wl.each_with_index do |movie,index|
         id = movie.dig('movie', 'ids', 'tmdb')
 

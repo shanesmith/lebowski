@@ -18,3 +18,6 @@ client_secret: $TRAKT_CLIENT_SECRET
 
 --
 GET /users/me/watchlist/movies/added
+
+--
+GET /users/me/watched/movies
