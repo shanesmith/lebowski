@@ -3,7 +3,9 @@ require "thor"
 class Error < Thor::Error; end
 
 # TODO
-# .- Take not of subscribed providers
+# - Login
+# - Combine channels (Starz, Paramount, etc..)
+# - Update summary
 
 module Lebowski
   class Cli < Thor
@@ -14,7 +16,8 @@ module Lebowski
 
     Ignore = [
       "Netflix basic with Ads",
-      "Hoopla"
+      "Hoopla",
+      "Club Illico"
     ]
 
     desc 'login', 'Login with Google'
