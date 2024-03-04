@@ -25,6 +25,40 @@ module Lebowski
       "CBC Gem",
     ]
 
+    Group = {
+      "Starz" => [
+        "Crave Starz",
+        "Starz Amazon Channel"
+      ],
+      "Paramount Plus" => [
+        "Paramount Plus",
+        "Paramount+ Amazon Channel",
+        "Paramount Plus Apple TV Channel",
+      ],
+      "Hollywood Suite" => [
+        "Hollywood Suite",
+        "Hollywood Suite Amazon Channel",
+      ],
+      "IFC Films" => [
+        "IFC Amazon Channel",
+        "IFC Films Unlimited Apple TV Channel",
+      ],
+      "Sundance Now" => [
+        "Sundance Now",
+        "Sundance Now Apple TV Channel",
+        "Sundance Now Amazon Channel",
+      ],
+      "Shudder" => [
+        "Shudder",
+        "Shudder Amazon Channel",
+        "Shudder Apple TV Channel",
+      ],
+      "AMC+" => [
+        "AMC+",
+        "AMC+ Amazon Channel",
+      ]
+    }
+
     desc 'login', 'Login with Google'
     def login
       puts "LOGIN!"
@@ -86,10 +120,31 @@ module Lebowski
         end
       end
 
+      Group.each do |name,members|
+        name = "*#{name}"
+        result[name] = []
+        members.each do |m|
+          other_members = members.dup.tap { |a| a.delete(m) }
+          if result[m].nil?
+            STDERR.puts "No such provider: #{m}"
+            next
+          end
+          common_movies = result[m].select do |movie|
+            other_members.difference(movie["other_providers"]).empty?
+          end
+          common_movies.each { |movie| movie["other_providers"] -= members }
+          result[name] += common_movies
+          result[m] -= common_movies
+          result.delete(m) if result[m].empty?
+        end
+        result[name].uniq!
+      end
+
       result = result
         .map do |provider, movies|
           {
             "provider" => provider,
+            "group" => provider.start_with?("*") ? Group[provider[1..]] : nil,
             "movies" => movies.sort_by { |m| m["other_providers"].size },
           }
         end

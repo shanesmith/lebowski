@@ -48,12 +48,19 @@
               class="card-header"
               role="button">
               <p class="card-header-title">
-                {{provider.provider}}
-                <span class="tag is-rounded ml-1">
+                <span class="mr-1">{{provider.provider.replace(/^\*/, "")}}</span>
+                <span class="tag is-rounded mr-1">
                   <span>{{provider.movies.filter(m => m["other_providers"].length == 0).length}}</span>
                   <span class="ml-1 has-text-weight-normal has-text-grey-light">|</span>
                   <span class="ml-1 has-text-weight-normal has-text-grey">{{provider.movies.length}}</span>
                 </span>
+                <b-tooltip
+                  v-if="provider.group"
+                  :label="provider.group.join(' / ')"
+                  position="is-right"
+                  type="is-light">
+                  <span class="tag is-rounded is-light">*</span>
+                </b-tooltip>
               </p>
               <a class="card-header-icon">
                 <b-icon :icon="props.open ? 'menu-up' : 'menu-down'"></b-icon>
@@ -64,9 +71,9 @@
             <ul class="mt-0">
               <li v-for="movie in provider.movies">
                 <a :href="movie.link" target="_blank">{{movie.title}} ({{movie.year}})</a>
-                <b-tooltip 
+                <b-tooltip
                   v-if="movie.other_providers.length != 0"
-                  :label="movie.other_providers.join(' / ')" 
+                  :label="movie.other_providers.join(' / ')"
                   position="is-right"
                   type="is-light">
                   <span class="tag is-rounded">{{movie.other_providers.length}}</span>
