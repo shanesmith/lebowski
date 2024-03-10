@@ -24,6 +24,9 @@ jobs:
           TMDB_ACCESS_TOKEN: ${{secrets.TMDB_ACCESS_TOKEN}}
         run: bundle exec bin/lebowski tmdb > site/data.json
 
+      - shell: bash
+        run: bundle exec bin/lebowski diff > site/diff.json
+
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site/

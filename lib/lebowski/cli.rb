@@ -1,4 +1,7 @@
 require "thor"
+require "hana"
+require 'faraday'
+require "json-diff"
 
 class Error < Thor::Error; end
 
@@ -68,6 +71,59 @@ module Lebowski
     desc 'user', 'Retrieve user data'
     def user
       puts "USER!"
+    end
+
+    desc 'diff', 'Diff!'
+    def diff
+      conn = Faraday.new("https://shanesmith.github.io") do |conn|
+        conn.response :json
+        conn.response :raise_error
+      end
+
+      current_diff = conn.get("/lebowski/diff.json").body rescue []
+
+      # old = JSON.load_file("site/old.json")
+      old = conn.get("/lebowski/data.json").body rescue nil
+
+      if old.nil?
+        puts JSON.pretty_generate(current_diff)
+        return
+      end
+
+      data = JSON.load_file("site/data.json")
+      diff = JsonDiff.diff(old, data, include_was: true)
+      targets = { "add" => data, "remove" => old, "replace" => data }
+
+      if diff.empty?
+        puts JSON.pretty_generate(current_diff)
+        return
+      end
+
+      diff = diff.map do |d|
+        path = Hana::Pointer.parse(d['path'])
+        target = targets[d["op"]]
+
+        movie_index = path[0] == "stream" ? 4 : 2
+
+        if path.size > movie_index
+          d["movie"] = Hana::Pointer.eval(path.take(movie_index), target)
+        end
+
+        d
+      end
+
+      current_diff.unshift({
+        "time" => Time.now.to_s,
+        "diff" => diff,
+      })
+
+      puts JSON.pretty_generate(current_diff)
+    end
+
+    desc 'path', 'Path!'
+    def path
+      old = JSON.load_file("site/data.json")
+      puts Hana::Pointer.new("/stream/7/movies/5/other_providers/1").eval(old)
     end
 
     desc 'wishlist', 'Show wishlist'
