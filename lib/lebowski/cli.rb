@@ -99,8 +99,13 @@ module Lebowski
         return
       end
 
-      diff = diff.map do |d|
+      diff.map! do |d|
         path = Hana::Pointer.parse(d['path'])
+
+        if d["op"] == "move"
+          next nil
+        end
+
         target = targets[d["op"]]
 
         movie_index = path[0] == "stream" ? 4 : 2
@@ -109,8 +114,14 @@ module Lebowski
           d["movie"] = Hana::Pointer.eval(path.take(movie_index), target)
         end
 
+        if path[0] == "stream" && path.size > 2
+          d["provider"] = Hana::Pointer.eval(path.take(2).append("provider"), target)
+        end
+
         d
       end
+
+      diff.compact!
 
       current_diff.unshift({
         "time" => Time.now.to_s,
