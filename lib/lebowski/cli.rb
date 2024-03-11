@@ -91,8 +91,7 @@ module Lebowski
       end
 
       data = JSON.load_file("site/data.json")
-      diff = JsonDiff.diff(old, data, include_was: true)
-      targets = { "add" => data, "remove" => old, "replace" => data }
+      diff = JsonDiff.diff(old, data, include_was: true, origial_indices: true)
 
       if diff.empty?
         puts JSON.pretty_generate(current_diff)
@@ -100,15 +99,16 @@ module Lebowski
       end
 
       diff.map! do |d|
+        op = d["op"]
         path = Hana::Pointer.parse(d['path'])
 
-        if d["op"] == "move"
+        if op == "move"
           next nil
         end
 
-        target = targets[d["op"]]
+        target = (op == "remove") ? old : data
 
-        movie_index = path[0] == "stream" ? 4 : 2
+        movie_index = (path[0] == "stream") ? 4 : 2
 
         if path.size > movie_index
           d["movie"] = Hana::Pointer.eval(path.take(movie_index), target)
