@@ -1,3 +1,4 @@
+require "time"
 require "thor"
 require "hana"
 require 'faraday'
@@ -13,6 +14,8 @@ class Error < Thor::Error; end
 
 module Lebowski
   class Cli < Thor
+    DiffCleanTime = Time.parse("2024-03-10 22:22:50 -0400")
+
     Subscribed = [
       "Netflix",
       "Amazon Prime Video"
@@ -81,6 +84,8 @@ module Lebowski
       end
 
       current_diff = conn.get("/lebowski/diff.json").body rescue []
+
+      current_diff = current_diff.take_while { |d| Time.parse(d["time"]) > DiffCleanTime }
 
       # old = JSON.load_file("site/old.json")
       old = conn.get("/lebowski/data.json").body rescue nil
