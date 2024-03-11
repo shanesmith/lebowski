@@ -66,16 +66,6 @@ module Lebowski
       ]
     }
 
-    desc 'login', 'Login with Google'
-    def login
-      puts "LOGIN!"
-    end
-
-    desc 'user', 'Retrieve user data'
-    def user
-      puts "USER!"
-    end
-
     desc 'diff', 'Diff!'
     def diff
       conn = Faraday.new("https://shanesmith.github.io") do |conn|
@@ -136,19 +126,13 @@ module Lebowski
       puts JSON.pretty_generate(current_diff)
     end
 
-    desc 'path', 'Path!'
-    def path
-      old = JSON.load_file("site/data.json")
-      puts Hana::Pointer.new("/stream/7/movies/5/other_providers/1").eval(old)
-    end
-
     desc 'wishlist', 'Show wishlist'
     def wishlist
       puts Lebowski::Trakt.wishlist.to_json
     end
 
-    desc 'tmdb', 'TMDB'
-    def tmdb
+    desc 'providers', 'Providers'
+    def providers
       wl = Lebowski::Trakt.wishlist
 
       wl.each_with_index do |movie,index|
