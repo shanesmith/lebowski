@@ -86,7 +86,7 @@ module Lebowski
       end
 
       data = JSON.load_file("site/data.json")
-      diff = JsonDiff.diff(old, data, include_was: true, origial_indices: true)
+      diff = JsonDiff.diff(old, data, include_was: true, origial_indices: true, moves: false)
 
       if diff.empty?
         puts JSON.pretty_generate(current_diff)
@@ -96,10 +96,6 @@ module Lebowski
       diff.map! do |d|
         op = d["op"]
         path = Hana::Pointer.parse(d['path'])
-
-        if op == "move"
-          next nil
-        end
 
         target = (op == "remove") ? old : data
 
@@ -115,8 +111,6 @@ module Lebowski
 
         d
       end
-
-      diff.compact!
 
       current_diff.unshift({
         "time" => Time.now.to_s,
@@ -185,7 +179,7 @@ module Lebowski
         list.each do |p|
           name = p["provider_name"]
 
-          providers[name] = [] unless providers.key?(name)
+          providers[name] ||= []
 
           providers[name] << {
             **item,
@@ -217,7 +211,7 @@ module Lebowski
       result = result
         .map do |provider, movies|
           {
-            "provider" => provider,
+            "provider" => provider.delete_prefix('*'),
             "group" => provider.start_with?("*") ? Group[provider[1..]] : nil,
             "movies" => movies.sort_by { |m| m["other_providers"].size },
           }
