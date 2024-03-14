@@ -27,6 +27,9 @@ jobs:
       - shell: bash
         run: bundle exec bin/lebowski diff > site/diff.json
 
+      - shell: bash
+        run: bundle exec bin/lebowski updates > site/updates.json
+
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site/

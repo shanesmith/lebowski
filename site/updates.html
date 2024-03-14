@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@5.8.55/css/materialdesignicons.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/buefy/dist/buefy.min.css">
+  <style>
+    h1.title {
+      font-size: 4rem;
+
+      font-family: "Abril Fatface", serif;
+      font-weight: normal;
+    }
+
+    #the_dude {
+      will-change: transform;
+    }
+
+    #the_dude:hover {
+      animation: wiggle 0.4s linear infinite;
+    }
+
+    @keyframes wiggle {
+      0% { transform: rotate(0deg); }
+      25% { transform: rotate(-15deg); }
+      50% { transform: rotate(0deg); }
+      75% { transform: rotate(10deg); }
+      100% { transform: rotate(0deg); }
+    }
+
+    .movies {
+      display: flex;
+      flex-wrap: wrap;
+      margin-left: 0 !important;
+    }
+
+    .movies > li {
+      flex: 1 1 44%;
+      margin-left: 2em;
+    }
+
+    .card {
+      border: 1px solid transparent;
+    }
+
+    .card:hover {
+      border-left: 1px solid #959595;
+    }
+
+    .card .card-header {
+      box-shadow: none;
+    }
+
+    .card.opened {
+      border: 1px solid #959595;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="app">
+
+    <section class="section">
+      <div class="container is-max-desktop is-flex is-align-items-center">
+        <img src="the_dude.png" id="the_dude" />
+        <div>
+          <h1 class="title ml-5">Lebowski</h1>
+          <h2 class="subtitle ml-5">Where's the movies, Lebowski?</h2>
+        </div>
+      </div>
+    </section>
+
+    <section class="section pt-4">
+      <div class="container is-max-desktop">
+        <h3 class="title is-3">Updates</h3>
+        <b-collapse
+          class="card"
+          animation="slide"
+          v-for="update in updateList"
+          :key="update.time"
+          :class="{ opened: isOpen == update.time }"
+          :open="isOpen == update.time"
+          @open="isOpen = update.time">
+          <template #trigger="props">
+            <div
+              class="card-header"
+              role="button">
+              <p class="card-header-title">
+                <span class="mr-1">{{timeFormat(update.time)}}</span>
+              </p>
+              <a class="card-header-icon">
+                <b-icon :icon="props.open ? 'menu-up' : 'menu-down'"></b-icon>
+              </a>
+            </div>
+          </template>
+          <div class="card-content content">
+            <ul class="mt-0 movies">
+              <li v-for="diff in update.updates">
+                <div>
+                  <a :href="diff.link" target="_blank">
+                    {{diff.title}}
+                    <span class="has-text-grey has-text-weight-light is-size-7">({{diff.year}})</span>
+                  </a>
+                </div>
+                <div>
+                  <span class="tag is-success" v-for="provider in diff.add">{{provider}}</span>
+                  <span class="tag is-danger" v-for="provider in diff.remove">{{provider}}</span>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </b-collapse>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="container is-max-desktop">
+        <a href="https://github.com/shanesmith/lebowski" class=" is-flex is-align-items-center is-justify-content-center">
+          <b-icon icon="github" class="mr-2 has-text-black"></b-icon>
+          https://github.com/shanesmith/lebowski
+        </a>
+      </div>
+    </footer>
+
+  </div>
+
+  <script src="https://unpkg.com/vue@2"></script>
+  <script src="https://unpkg.com/buefy/dist/buefy.min.js"></script>
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        updateList: [],
+        isOpen: "",
+      },
+      methods: {
+        timeFormat(time) {
+          return new Date(time).toLocaleString(undefined, {dateStyle: "medium", timeStyle: "medium"})
+        }
+      },
+      created: function() {
+        fetch("./updates.json")
+          .then(response => response.json())
+          .then(json => this.updateList = json)
+      }
+    })
+  </script>
+</body>
+</html>

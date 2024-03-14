@@ -1,2 +1,4 @@
 .env
 site/data.json
+site/diff.json
+site/updates.json
