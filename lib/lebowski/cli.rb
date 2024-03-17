@@ -177,6 +177,10 @@ module Lebowski
           "link" => movie["link"],
           "remove" => [],
           "add" => [],
+          "providers" => data["stream"]
+            .select { |p| p["movies"].any? { |m| m["ids"]["tmdb"] == id } }
+            .map { |p| p["provider"] },
+
         }
 
         updates[id][op] << if path[0] == "stream"

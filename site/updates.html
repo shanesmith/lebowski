@@ -115,6 +115,15 @@
                 <div>
                   <span class="tag is-success" v-for="provider in diff.add">{{provider}}</span>
                   <span class="tag is-danger" v-for="provider in diff.remove">{{provider}}</span>
+                  <b-tooltip
+                    v-if="diff.providers"
+                    position="is-right"
+                    :label="diff.providers.join(' / ')"
+                    type="is-light">
+                    <span class="tag">
+                      <b-icon icon="creation" size="is-small"></b-icon>
+                    </span>
+                  </b-tooltip>
                 </div>
               </li>
             </ul>
