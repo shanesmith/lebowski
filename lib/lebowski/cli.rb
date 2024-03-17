@@ -130,6 +130,10 @@ module Lebowski
       puts JSON.pretty_generate(current_diff)
     end
 
+    # TODO
+    # - Adding/Removing movie from wishlist
+    # - Adding/Removing a whole provider isn't reflected
+    #   - Remove all movies from a provider will remove the provider
     desc 'updates', "Updates"
     def updates
       conn = Faraday.new(Host) do |conn|
