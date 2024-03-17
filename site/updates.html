@@ -57,6 +57,10 @@
     .card.opened {
       border: 1px solid #959595;
     }
+
+    a.has-text-grey:hover {
+      color: #7957d5 !important;
+    }
   </style>
 </head>
 <body>
@@ -76,6 +80,9 @@
     <section class="section pt-4">
       <div class="container is-max-desktop">
         <h3 class="title is-3">Updates</h3>
+        <div style="margin: -1rem 0 1.5rem;">
+          <a href="/"  class="has-text-grey">&laquo; back</a>
+        </div>
         <b-collapse
           class="card"
           animation="slide"
@@ -138,7 +145,12 @@
       },
       methods: {
         timeFormat(time) {
-          return new Date(time).toLocaleString(undefined, {dateStyle: "medium", timeStyle: "medium"})
+          return new Date(time).toLocaleString(undefined, {
+            month: "short",
+            day: "numeric",
+            hour: "numeric",
+            minute: "numeric",
+          })
         }
       },
       created: function() {

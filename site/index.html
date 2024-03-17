@@ -57,6 +57,10 @@
     .card.opened {
       border: 1px solid #959595;
     }
+
+    a.has-text-grey:hover {
+      color: #7957d5 !important;
+    }
   </style>
 </head>
 <body>
@@ -75,6 +79,9 @@
 
     <section class="section pt-4">
       <div class="container is-max-desktop">
+        <div class="has-text-right pb-2" style="margin-top: -1.5rem;" v-if="lastUpdate">
+          <a href="/updates.html" class="has-text-grey">Last Updated {{timeFormat(lastUpdate)}}</a>
+        </div>
         <b-collapse
           class="card"
           animation="slide"
@@ -178,11 +185,26 @@
         list: {},
         isOpen: "",
         otherTypes: ["rent", "buy", "unavailable"],
+        lastUpdate: null,
+      },
+      methods: {
+        timeFormat(time) {
+          return new Date(time).toLocaleString(undefined, {
+            month: "short",
+            day: "numeric",
+            hour: "numeric",
+            minute: "numeric",
+          })
+        }
       },
       created: function() {
         fetch("./data.json")
           .then(response => response.json())
           .then(json => this.list = json)
+
+        fetch("./updates.json")
+          .then(response => response.json())
+          .then(json => this.lastUpdate = json[0].time)
       }
     })
   </script>
