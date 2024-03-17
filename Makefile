@@ -1,8 +1,20 @@
 data:
-	bundle exec dotenv bin/lebowski tmdb
+	bundle exec dotenv bin/lebowski providers
+
+diff:
+	bundle exec dotenv bin/lebowski diff
+
+updates:
+	bundle exec dotenv bin/lebowski updates
 
 site-data:
-	bundle exec dotenv bin/lebowski tmdb > site/data.json
+	bundle exec dotenv bin/lebowski providers | sponge site/data.json
+
+site-diff:
+	bundle exec dotenv bin/lebowski diff | sponge  site/diff.json
+
+site-updates:
+	bundle exec dotenv bin/lebowski updates | sponge site/updates.json
 
 fetch: fetch-updates fetch-diff fetch-data
 

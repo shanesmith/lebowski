@@ -17,6 +17,8 @@ module Lebowski
     DiffCleanTime = Time.parse("2024-03-10 22:22:50 -0400")
     UpdatesCleanTime = Time.parse("2020-08-25 00:00:00 -0400")
 
+    Host = ENV["CI"] ? "https://shanesmith.github.io/lebowski/" : "http://localhost:8080/"
+
     Subscribed = [
       "Netflix",
       "Amazon Prime Video"
@@ -73,17 +75,20 @@ module Lebowski
 
     desc 'diff', 'Diff!'
     def diff
-      conn = Faraday.new("https://shanesmith.github.io") do |conn|
+      conn = Faraday.new(Host) do |conn|
         conn.response :json
         conn.response :raise_error
       end
 
-      current_diff = conn.get("/lebowski/diff.json").body rescue []
+      current_diff = conn.get("diff.json").body rescue []
 
       current_diff = current_diff.take_while { |d| Time.parse(d["time"]) > DiffCleanTime }
 
-      # old = JSON.load_file("site/old.json")
-      old = conn.get("/lebowski/data.json").body rescue nil
+      old = if File.exist?("site/old.json")
+              JSON.load_file("site/old.json")
+            else
+              conn.get("data.json").body rescue nil
+            end
 
       if old.nil?
         puts JSON.pretty_generate(current_diff)
@@ -127,17 +132,19 @@ module Lebowski
 
     desc 'updates', "Updates"
     def updates
-      conn = Faraday.new("https://shanesmith.github.io") do |conn|
+      conn = Faraday.new(Host) do |conn|
         conn.response :json
         conn.response :raise_error
       end
-
-      current_updates = conn.get("/lebowski/updates.json").body rescue []
+      current_updates = conn.get("updates.json").body rescue []
 
       current_updates = current_updates.take_while { |d| Time.parse(d["time"]) > UpdatesCleanTime }
 
-      # old = JSON.load_file("site/old.json")
-      old = conn.get("/lebowski/data.json").body rescue nil
+      old = if File.exist?("site/old.json")
+              JSON.load_file("site/old.json")
+            else
+              conn.get("data.json").body rescue nil
+            end
 
       if old.nil?
         puts JSON.pretty_generate(current_updates)
