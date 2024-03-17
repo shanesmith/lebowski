@@ -64,7 +64,11 @@ module Lebowski
       "AMC+" => [
         "AMC+",
         "AMC+ Amazon Channel",
-      ]
+      ],
+      "Super Channel" => [
+        "Super Channel Amazon Channel",
+        "fuboTV",
+      ],
     }
 
     desc 'diff', 'Diff!'
