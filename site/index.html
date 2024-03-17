@@ -96,18 +96,18 @@
               role="button">
               <p class="card-header-title">
                 <span class="mr-1">{{provider.provider}}</span>
-                <span class="tag is-rounded mr-1">
-                  <span>{{provider.movies.filter(m => m["other_providers"].length == 0).length}}</span>
-                  <span class="ml-1 has-text-weight-normal has-text-grey-light">|</span>
-                  <span class="ml-1 has-text-weight-normal has-text-grey">{{provider.movies.length}}</span>
-                </span>
                 <b-tooltip
                   v-if="provider.group"
                   :label="provider.group.join(' / ')"
                   position="is-right"
                   type="is-light">
-                  <span class="tag is-rounded is-light">*</span>
+                  <span class="tag is-rounded is-light mr-1"><b-icon icon="creation" size="is-small"></b-icon></span>
                 </b-tooltip>
+                <span class="tag is-rounded">
+                  <span>{{provider.movies.filter(m => m["other_providers"].length == 0).length}}</span>
+                  <span class="ml-1 has-text-weight-normal has-text-grey-light">|</span>
+                  <span class="ml-1 has-text-weight-normal has-text-grey">{{provider.movies.length}}</span>
+                </span>
               </p>
               <a class="card-header-icon">
                 <b-icon :icon="props.open ? 'menu-up' : 'menu-down'"></b-icon>
