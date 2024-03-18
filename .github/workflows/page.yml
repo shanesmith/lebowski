@@ -17,6 +17,9 @@ jobs:
           bundler-cache: true
 
       - shell: bash
+        run: wget https://shanesmith.github.io/lebowski/data.json -O site/old.json
+
+      - shell: bash
         env:
           TRAKT_CLIENT_ID: ${{secrets.TRAKT_CLIENT_ID}}
           TRAKT_CLIENT_SECRET: ${{secrets.TRAKT_CLIENT_SECRET}}
