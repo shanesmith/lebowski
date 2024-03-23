@@ -86,10 +86,10 @@
           class="card"
           animation="slide"
           v-for="provider in list.stream"
-          :key="provider.provider"
-          :class="{ opened: isOpen == provider.provider }"
-          :open="isOpen == provider.provider"
-          @open="isOpen = provider.provider">
+          :key="providerKey(provider)"
+          :class="{ opened: isOpen == providerKey(provider) }"
+          :open="isOpen == providerKey(provider)"
+          @open="isOpen = providerKey(provider)">
           <template #trigger="props">
             <div
               class="card-header"
@@ -167,7 +167,7 @@
 
     <footer class="footer">
       <div class="container is-max-desktop">
-        <a href="https://github.com/shanesmith/lebowski" class=" is-flex is-align-items-center is-justify-content-center">
+        <a href="https://github.com/shanesmith/lebowski" class="is-flex is-align-items-center is-justify-content-center">
           <b-icon icon="github" class="mr-2 has-text-black"></b-icon>
           https://github.com/shanesmith/lebowski
         </a>
@@ -198,6 +198,9 @@
         },
         stopProp(event) {
           event.stopPropagation()
+        },
+        providerKey(provider) {
+          return `${provider.provider}${provider.group == null ? '' : '-group'}`
         }
       },
       created: function() {
