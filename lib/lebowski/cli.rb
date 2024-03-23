@@ -135,7 +135,7 @@ module Lebowski
     end
 
     # TODO
-    # - Adding/Removing movie from wishlist
+    # - Adding/Removing movie from watchlist
     # - Adding/Removing a whole provider isn't reflected
     #   - Remove all movies from a provider will remove the provider
     desc 'updates', "Updates"
@@ -211,18 +211,18 @@ module Lebowski
       puts JSON.pretty_generate(current_updates)
     end
 
-    desc 'wishlist', 'Show wishlist'
+    desc 'watchlist', 'Show watchlist'
     option :'with-providers', :type => :boolean
     option :pretty, :type => :boolean
-    def wishlist
-      puts Lebowski::Wishlist
+    def watchlist
+      puts Lebowski::Watchlist
         .fetch(with_providers: options[:'with-providers'])
         .to_json(pretty: options[:pretty])
     end
 
     desc 'providers', 'Providers'
     def providers
-      wl = Lebowski::Trakt.wishlist
+      wl = Lebowski::Trakt.watchlist
 
       wl.each_with_index do |movie,index|
         id = movie.dig('movie', 'ids', 'tmdb')

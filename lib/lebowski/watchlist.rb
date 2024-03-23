@@ -1,21 +1,21 @@
 module Lebowski
-  class Wishlist
-    @wishlist = nil
+  class Watchlist
+    @watchlist = nil
 
     class << self
       def fetch(with_providers: false)
-        wishlist = Wishlist.new(Lebowski::Trakt.wishlist)
-        wishlist.fetch_providers if with_providers
-        wishlist
+        watchlist = Watchlist.new(Lebowski::Trakt.watchlist)
+        watchlist.fetch_providers if with_providers
+        watchlist
       end
     end
 
-    def initialize(wishlist)
-      @wishlist = wishlist
+    def initialize(watchlist)
+      @watchlist = watchlist
     end
 
     def fetch_providers
-      @wishlist.each_with_index do |movie, index|
+      @watchlist.each_with_index do |movie, index|
         id = movie.dig('movie', 'ids', 'tmdb')
 
         STDERR.puts "#{index} - #{movie['movie']['title']} (#{id})"
@@ -32,14 +32,14 @@ module Lebowski
     end
 
     def value
-      @wishlist
+      @watchlist
     end
 
     def to_json(pretty: false)
       if pretty
-        JSON.pretty_generate(@wishlist)
+        JSON.pretty_generate(@watchlist)
       else
-        @wishlist.to_json
+        @watchlist.to_json
       end
     end
   end
