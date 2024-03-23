@@ -212,8 +212,12 @@ module Lebowski
     end
 
     desc 'wishlist', 'Show wishlist'
+    option :'with-providers', :type => :boolean
+    option :pretty, :type => :boolean
     def wishlist
-      puts Lebowski::Trakt.wishlist.to_json
+      puts Lebowski::Wishlist
+        .fetch(with_providers: options[:'with-providers'])
+        .to_json(pretty: options[:pretty])
     end
 
     desc 'providers', 'Providers'

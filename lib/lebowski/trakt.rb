@@ -24,7 +24,7 @@ module Lebowski
       #         "imdb"=>"tt12818328", 
       #         "tmdb"=>1019939}}},
       def wishlist
-        @wishlist ||= conn.get("/users/me/watchlist/movies/added").body
+        conn.get("/users/me/watchlist/movies/added").body
       end
 
       def conn
