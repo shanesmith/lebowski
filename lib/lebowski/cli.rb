@@ -71,6 +71,10 @@ module Lebowski
         "Super Channel Amazon Channel",
         "fuboTV",
       ],
+      "Crunchyroll" => [
+        "Crunchyroll",
+        "Crunchyroll Amazon Channel",
+      ]
     }
 
     desc 'diff', 'Diff!'
