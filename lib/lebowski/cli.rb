@@ -198,6 +198,11 @@ module Lebowski
                            end
       end
 
+      if updates.empty?
+        puts JSON.pretty_generate(current_updates)
+        return
+      end
+
       current_updates.unshift({
         "time" => Time.now.to_s,
         "updates" => updates,

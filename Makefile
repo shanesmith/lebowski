@@ -16,7 +16,7 @@ site-diff:
 site-updates:
 	bundle exec dotenv bin/lebowski updates | sponge site/updates.json
 
-fetch: fetch-updates fetch-diff fetch-data
+fetch: fetch-updates fetch-diff fetch-data fetch-old
 
 fetch-updates:
 	wget -O site/updates.json https://shanesmith.github.io/lebowski/updates.json
@@ -26,3 +26,6 @@ fetch-diff:
 
 fetch-data:
 	wget -O site/data.json https://shanesmith.github.io/lebowski/data.json
+
+fetch-old:
+	wget -O site/old.json https://shanesmith.github.io/lebowski/old.json
