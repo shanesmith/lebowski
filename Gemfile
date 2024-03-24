@@ -11,5 +11,3 @@ gem 'dotenv', groups: [:development, :test]
 gem 'pry', groups: [:development]
 
 gem "hana", "~> 1.3"
-
-gem "json-diff", "~> 0.4.1"
