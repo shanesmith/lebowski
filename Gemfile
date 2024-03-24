@@ -9,5 +9,3 @@ gem "faraday", "~> 2.9"
 gem 'dotenv', groups: [:development, :test]
 
 gem 'pry', groups: [:development]
-
-gem "hana", "~> 1.3"
