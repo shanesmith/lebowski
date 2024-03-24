@@ -26,14 +26,14 @@ module Lebowski
         conn.response :raise_error
       end
 
-      current_diff = conn.get("diff.json").body rescue []
+      current_diff = conn.get("data/diff.json").body rescue []
 
       current_diff = current_diff.take_while { |d| Time.parse(d["time"]) > DiffCleanTime }
 
-      old = if File.exist?("site/old.json")
-              JSON.load_file("site/old.json")
+      old = if File.exist?("site/data/old-providerlist.json")
+              JSON.load_file("site/data/old-providerlist.json")
             else
-              conn.get("data.json").body rescue nil
+              conn.get("data/providerlist.json").body rescue nil
             end
 
       if old.nil?
@@ -41,7 +41,7 @@ module Lebowski
         return
       end
 
-      data = JSON.load_file("site/data.json")
+      data = JSON.load_file("site/providerlist.json")
       diff = JsonDiff.diff(old, data, include_was: true, origial_indices: true, moves: false)
 
       if diff.empty?
@@ -86,14 +86,14 @@ module Lebowski
         conn.response :json
         conn.response :raise_error
       end
-      current_updates = conn.get("updates.json").body rescue []
+      current_updates = conn.get("data/updates.json").body rescue []
 
       current_updates = current_updates.take_while { |d| Time.parse(d["time"]) > UpdatesCleanTime }
 
-      old = if File.exist?("site/old.json")
-              JSON.load_file("site/old.json")
+      old = if File.exist?("site/data/old-providerlist.json")
+              JSON.load_file("site/data/old-providerlist.json")
             else
-              conn.get("data.json").body rescue nil
+              conn.get("data/providerlist.json").body rescue nil
             end
 
       if old.nil?
@@ -101,7 +101,7 @@ module Lebowski
         return
       end
 
-      data = JSON.load_file("site/data.json")
+      data = JSON.load_file("site/data/providerlist.json")
       diff = JsonDiff.diff(old, data, include_was: true, origial_indices: true, moves: false)
 
       if diff.empty?

@@ -17,7 +17,7 @@ jobs:
           bundler-cache: true
 
       - shell: bash
-        run: wget https://shanesmith.github.io/lebowski/data.json -O site/old.json
+        run: wget https://shanesmith.github.io/lebowski/data/old-providerlist.json -O site/data/old-providerlist.json
 
       - shell: bash
         env:
@@ -25,13 +25,13 @@ jobs:
           TRAKT_CLIENT_SECRET: ${{secrets.TRAKT_CLIENT_SECRET}}
           TRAKT_ACCESS_TOKEN: ${{secrets.TRAKT_ACCESS_TOKEN}}
           TMDB_ACCESS_TOKEN: ${{secrets.TMDB_ACCESS_TOKEN}}
-        run: bundle exec bin/lebowski providers > site/data.json
+        run: bundle exec bin/lebowski providerlist > site/data/providerlist.json
 
       - shell: bash
-        run: bundle exec bin/lebowski diff > site/diff.json
+        run: bundle exec bin/lebowski diff > site/data/diff.json
 
       - shell: bash
-        run: bundle exec bin/lebowski updates > site/updates.json
+        run: bundle exec bin/lebowski updates > site/data/updates.json
 
       - uses: actions/upload-pages-artifact@v3
         with:

@@ -1,5 +1,8 @@
-data:
-	bundle exec dotenv bin/lebowski providers
+watchlist:
+	bundle exec dotenv bin/lebowski watchlist
+
+providerlist:
+	bundle exec dotenv bin/lebowski providerlist
 
 diff:
 	bundle exec dotenv bin/lebowski diff
@@ -7,25 +10,31 @@ diff:
 updates:
 	bundle exec dotenv bin/lebowski updates
 
-site-data:
-	bundle exec dotenv bin/lebowski providers | sponge site/data.json
+site-watchlist:
+	bundle exec dotenv bin/lebowski watchlist | sponge site/data/watchlist.json
+
+site-providerlist:
+	bundle exec dotenv bin/lebowski providerlist | sponge site/data/providerlist.json
 
 site-diff:
-	bundle exec dotenv bin/lebowski diff | sponge  site/diff.json
+	bundle exec dotenv bin/lebowski diff | sponge  site/data/diff.json
 
 site-updates:
-	bundle exec dotenv bin/lebowski updates | sponge site/updates.json
+	bundle exec dotenv bin/lebowski updates | sponge site/data/updates.json
 
-fetch: fetch-updates fetch-diff fetch-data fetch-old
+fetch: fetch-updates fetch-diff fetch-providerlist fetch-watchlist fetch-old
+
+fetch-watchlist:
+	wget -O site/data/watchlist.json https://shanesmith.github.io/lebowski/data/watchlist.json
+
+fetch-providerlist:
+	wget -O site/data/providerlist.json https://shanesmith.github.io/lebowski/data/providerlist.json
 
 fetch-updates:
-	wget -O site/updates.json https://shanesmith.github.io/lebowski/updates.json
+	wget -O site/data/updates.json https://shanesmith.github.io/lebowski/data/updates.json
 
 fetch-diff:
-	wget -O site/diff.json https://shanesmith.github.io/lebowski/diff.json
+	wget -O site/data/diff.json https://shanesmith.github.io/lebowski/data/diff.json
 
-fetch-data:
-	wget -O site/data.json https://shanesmith.github.io/lebowski/data.json
-
-fetch-old:
-	wget -O site/old.json https://shanesmith.github.io/lebowski/old.json
+fetch-old-providerlist:
+	wget -O site/data/old.json https://shanesmith.github.io/lebowski/data/old-providerlist.json
