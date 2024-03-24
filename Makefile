@@ -1,8 +1,8 @@
 watchlist:
-	bundle exec dotenv bin/lebowski watchlist
+	bundle exec dotenv bin/lebowski watchlist --with-providers --pretty
 
 providerlist:
-	bundle exec dotenv bin/lebowski providerlist
+	bundle exec dotenv bin/lebowski providerlist --pretty
 
 diff:
 	bundle exec dotenv bin/lebowski diff
@@ -11,10 +11,10 @@ updates:
 	bundle exec dotenv bin/lebowski updates
 
 site-watchlist:
-	bundle exec dotenv bin/lebowski watchlist | sponge site/data/watchlist.json
+	bundle exec dotenv bin/lebowski watchlist --with-providers --pretty | sponge site/data/watchlist.json
 
 site-providerlist:
-	bundle exec dotenv bin/lebowski providerlist | sponge site/data/providerlist.json
+	bundle exec dotenv bin/lebowski providerlist --pretty | sponge site/data/providerlist.json
 
 site-diff:
 	bundle exec dotenv bin/lebowski diff | sponge  site/data/diff.json
