@@ -98,7 +98,7 @@ module Lebowski
             diff_movie['diff'] << { op: 'add', type: 'unavailable' }
           elsif other_providers['flatrate']
             diff_movie['diff'] << { op: 'remove', type: 'rent' }
-            diff_movie['diff'] << { op: 'add', type: 'providers', providers: providers['flatrate'] }
+            diff_movie['diff'] << { op: 'add', type: 'providers', providers: other_providers['flatrate'] }
           elsif other_providers['rent']
             next
           elsif other_providers['buy']
@@ -115,7 +115,7 @@ module Lebowski
             diff_movie['diff'] << { op: 'add', type: 'unavailable' }
           elsif other_providers['flatrate']
             diff_movie['diff'] << { op: 'remove', type: 'buy' }
-            diff_movie['diff'] << { op: 'add', type: 'providers', providers: providers['flatrate'] }
+            diff_movie['diff'] << { op: 'add', type: 'providers', providers: other_providers['flatrate'] }
           elsif other_providers['rent']
             diff_movie['diff'] << { op: 'remove', type: 'buy' }
             diff_movie['diff'] << { op: 'add', type: 'rent' }
@@ -131,7 +131,7 @@ module Lebowski
             next
           elsif other_providers['flatrate']
             diff_movie['diff'] << { op: 'remove', type: 'unavailable' }
-            diff_movie['diff'] << { op: 'add', type: 'providers', providers: providers['flatrate'] }
+            diff_movie['diff'] << { op: 'add', type: 'providers', providers: other_providers['flatrate'] }
           elsif other_providers['rent']
             diff_movie['diff'] << { op: 'remove', type: 'unavailable' }
             diff_movie['diff'] << { op: 'add', type: 'rent' }
