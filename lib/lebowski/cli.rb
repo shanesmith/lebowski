@@ -1,7 +1,4 @@
-require "time"
 require "thor"
-require "hana"
-require 'faraday'
 
 class Error < Thor::Error; end
 
@@ -13,11 +10,6 @@ class Error < Thor::Error; end
 
 module Lebowski
   class Cli < Thor
-    DiffCleanTime = Time.parse("2024-03-10 22:22:50 -0400")
-    UpdatesCleanTime = Time.parse("2020-08-25 00:00:00 -0400")
-
-    Host = ENV["CI"] ? "https://shanesmith.github.io/lebowski/" : "http://localhost:8080/"
-
     desc 'diff', 'Diff!'
     option :pretty, :type => :boolean
     def diff(from_path, to_path)
@@ -39,11 +31,16 @@ module Lebowski
 
     desc 'providerlist', 'Provider List'
     option :pretty, :type => :boolean
-    def providerlist
-     watchlist = Lebowski::Watchlist.fetch(with_providers: true)
+    def providerlist(watchlist_path)
+      watchlist = Lebowski::Watchlist.new(JSON.load_file(watchlist_path))
 
-     puts Lebowski::Providerlist.new(watchlist)
+      puts Lebowski::Providerlist.new(watchlist)
         .to_json(pretty: options[:pretty])
+    end
+
+    desc 'generate', 'Generate'
+    def generate
+      Lebowski::Generate.run
     end
   end
 end

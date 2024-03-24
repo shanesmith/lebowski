@@ -5,6 +5,7 @@ require 'lebowski/diff'
 require 'lebowski/trakt'
 require 'lebowski/tmdb'
 require 'lebowski/utils'
+require 'lebowski/generate'
 require 'lebowski/watchlist'
 require 'lebowski/providerlist'
 
