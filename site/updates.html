@@ -86,17 +86,17 @@
         <b-collapse
           class="card"
           animation="slide"
-          v-for="update in updateList"
-          :key="update.time"
-          :class="{ opened: isOpen == update.time }"
-          :open="isOpen == update.time"
-          @open="isOpen = update.time">
+          v-for="updateList in updateHistory"
+          :key="updateList.time"
+          :class="{ opened: isOpen == updateList.time }"
+          :open="isOpen == updateList.time"
+          @open="isOpen = updateList.time">
           <template #trigger="props">
             <div
               class="card-header"
               role="button">
               <p class="card-header-title">
-                <span class="mr-1">{{timeFormat(update.time)}}</span>
+                <span class="mr-1">{{timeFormat(updateList.time)}}</span>
               </p>
               <a class="card-header-icon">
                 <b-icon :icon="props.open ? 'menu-up' : 'menu-down'"></b-icon>
@@ -105,25 +105,43 @@
           </template>
           <div class="card-content content">
             <ul class="mt-0 movies">
-              <li v-for="diff in update.updates">
+              <li v-for="movie in updateList.updates">
                 <div>
-                  <a :href="diff.link" target="_blank">
-                    {{diff.title}}
-                    <span class="has-text-grey has-text-weight-light is-size-7">({{diff.year}})</span>
-                  </a>
+                  <!-- <a :href="movie.link" target="_blank"> -->
+                    {{movie.movie.title}}
+                    <span class="has-text-grey has-text-weight-light is-size-7">({{movie.movie.year}})</span>
+                  <!-- </a> -->
                 </div>
                 <div>
-                  <span class="tag is-success" v-for="provider in diff.add">{{provider}}</span>
-                  <span class="tag is-danger" v-for="provider in diff.remove">{{provider}}</span>
-                  <b-tooltip
-                    v-if="diff.providers"
-                    position="is-right"
-                    :label="diff.providers.join(' / ')"
-                    type="is-light">
-                    <span class="tag">
-                      <b-icon icon="creation" size="is-small"></b-icon>
+                  <template v-for="diff in movie.diff">
+                    <template v-if="diff.type == 'providers'">
+                      <span 
+                        class="tag mr-1"
+                        :class="diff.op == 'add' ? 'is-success' : 'is-danger'"
+                        v-for="prov in diff.providers"
+                        >
+                        {{prov.provider_name}}
+                      </span>
+                    </template>
+                    <span 
+                      class="tag is-capitalized mr-1"
+                      :class="diff.op == 'add' ? 'is-success' : 'is-danger'"
+                      v-else
+                      >
+                      {{diff.type}}
                     </span>
-                  </b-tooltip>
+                  </template>
+                  <!--
+                    <b-tooltip
+                      v-if="diff.providers"
+                      position="is-right"
+                      :label="diff.providers.join(' / ')"
+                      type="is-light">
+                      <span class="tag">
+                        <b-icon icon="creation" size="is-small"></b-icon>
+                      </span>
+                    </b-tooltip>
+                  -->
                 </div>
               </li>
             </ul>
@@ -149,7 +167,7 @@
     new Vue({
       el: '#app',
       data: {
-        updateList: [],
+        updateHistory: [],
         isOpen: "",
       },
       methods: {
@@ -163,9 +181,9 @@
         }
       },
       created: function() {
-        fetch("./updates.json")
+        fetch("./data/updates-watchlist.json")
           .then(response => response.json())
-          .then(json => this.updateList = json)
+          .then(json => this.updateHistory = json)
       }
     })
   </script>
