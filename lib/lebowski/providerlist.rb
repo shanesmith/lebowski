@@ -5,13 +5,6 @@ module Lebowski
       "Amazon Prime Video"
     ]
 
-    Ignore = [
-      "Netflix basic with Ads",
-      "Hoopla",
-      "Club Illico",
-      "iciTouTV",
-    ]
-
     AdsAllow = [
       "CBC Gem",
     ]
@@ -90,7 +83,6 @@ module Lebowski
 
         list += (movie.dig("providers", "flatrate") || [])
           .each { |p| p["provider_name"].strip! }
-          .reject { |p| Ignore.include?(p["provider_name"]) }
 
         list += (movie.dig("providers", "ads") || [])
           .each { |p| p["provider_name"].strip! }

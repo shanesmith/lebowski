@@ -1,5 +1,12 @@
 module Lebowski
   class Watchlist
+    IgnoreProviders = [
+      "Netflix basic with Ads",
+      "Hoopla",
+      "Club Illico",
+      "iciTouTV",
+    ]
+
     @watchlist = nil
 
     class << self
@@ -27,7 +34,11 @@ module Lebowski
         end
 
         movie["providers"] = Lebowski::TMDB.providers(id)
-        STDERR.puts (movie.dig("providers", "flatrate") || []).map { |p| p["provider_name"] }.join(" / ")
+
+        movie.dig("providers", "flatrate").tap do |flatrate|
+          next if flatrate.nil?
+          flatrate.reject! { |p| IgnoreProviders.include?(p["provider_name"])}
+        end
       end
     end
 
