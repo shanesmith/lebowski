@@ -157,7 +157,10 @@
           <div class="card-content content">
             <ul class="mt-0 movies">
               <li v-for="movie in list[type]">
-                <a :href="movie.link" target="_blank">{{movie.title}} ({{movie.year}})</a>
+                <a :href="movie.link" target="_blank">
+                  {{movie.title}}
+                  <span class="has-text-grey has-text-weight-light is-size-7">({{movie.year}})</span>
+                </a>
               </li>
             </ul>
           </div>
