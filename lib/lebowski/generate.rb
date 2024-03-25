@@ -3,7 +3,14 @@ require 'faraday'
 
 module Lebowski
   class Generate
-    Host = ENV["CI"] ? "https://shanesmith.github.io/lebowski/" : "http://localhost:8080/"
+    GithubHost = "https://shanesmith.github.io/lebowski/"
+    LocalHost = "http://localhost:8080/"
+    Host = ENV["CI"] ? GithubHost : LocalHost
+
+    WatchlistPath = "data/watchlist.json"
+    OldWatchlistPath = "data/old-watchlist.json"
+    UpdatesWatchlistPath = "data/updates-watchlist.json"
+    ProviderlistPath = "data/providerlist.json"
 
     class << self
       def run
@@ -14,19 +21,10 @@ module Lebowski
           })
         end
 
-        File.write("site/data/watchlist.json", watchlist.to_json(pretty: true))
-        File.write("site/data/providerlist.json", providerlist.to_json(pretty: true))
-        File.write("site/data/old-watchlist.json", old_watchlist.to_json(pretty: true))
-        File.write("site/data/updates-watchlist.json", JSON.pretty_generate(updates_watchlist))
-      end
-
-      private
-
-      def conn
-        @conn ||= Faraday.new(Host) do |conn|
-          conn.response :json
-          conn.response :raise_error
-        end
+        File.write(site_path(WatchlistPath), watchlist.to_json(pretty: true))
+        File.write(site_path(ProviderlistPath), providerlist.to_json(pretty: true))
+        File.write(site_path(OldWatchlistPath), old_watchlist.to_json(pretty: true))
+        File.write(site_path(UpdatesWatchlistPath), JSON.pretty_generate(updates_watchlist))
       end
 
       def watchlist
@@ -38,22 +36,29 @@ module Lebowski
       end
 
       def updates_watchlist
-        @updates_watchlist ||= begin
-          conn.get("data/updates-watchlist.json").body
-        rescue Faraday::Error
-          []
-        end
+        @updates_watchlist ||= fetch(UpdatesWatchlistPath, default: [])
       end
 
       def old_watchlist
-        @old_watchlist ||= begin
-          data = begin
-            conn.get("data/watchlist.json").body
-          rescue Faraday::Error
-            []
-          end
+        @old_watchlist ||= Lebowski::Watchlist.new(fetch(WatchlistPath, default: []))
+      end
 
-          Lebowski::Watchlist.new(data)
+      def fetch(path, default: nil)
+        conn.get(path).body
+      rescue Faraday::Error
+        default
+      end
+
+      def site_path(path)
+        "site/#{path}"
+      end
+
+      private
+
+      def conn
+        @conn ||= Faraday.new(Host) do |conn|
+          conn.response :json
+          conn.response :raise_error
         end
       end
     end

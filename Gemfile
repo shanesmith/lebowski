@@ -9,3 +9,5 @@ gem "faraday", "~> 2.9"
 gem 'dotenv', groups: [:development, :test]
 
 gem 'pry', groups: [:development]
+
+gem "rake", "~> 13.1"
