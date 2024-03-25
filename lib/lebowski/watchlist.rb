@@ -1,6 +1,6 @@
 module Lebowski
   class Watchlist
-    IgnoreProviders = [
+    IGNORE_PROVIDERS = [
       "Netflix basic with Ads",
       "Hoopla",
       "Club Illico",
@@ -37,7 +37,7 @@ module Lebowski
 
         movie.dig("providers", "flatrate").tap do |flatrate|
           next if flatrate.nil?
-          flatrate.reject! { |p| IgnoreProviders.include?(p["provider_name"])}
+          flatrate.reject! { |p| IGNORE_PROVIDERS.include?(p["provider_name"])}
         end
       end
     end

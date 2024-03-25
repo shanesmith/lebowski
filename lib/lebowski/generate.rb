@@ -3,14 +3,14 @@ require 'faraday'
 
 module Lebowski
   class Generate
-    GithubHost = "https://shanesmith.github.io/lebowski/"
-    LocalHost = "http://localhost:8080/"
-    Host = ENV["CI"] ? GithubHost : LocalHost
+    GITHUB_HOST = "https://shanesmith.github.io/lebowski/"
+    LOCAL_HOST = "http://localhost:8080/"
+    Host = ENV["CI"] ? GITHUB_HOST : LOCAL_HOST
 
-    WatchlistPath = "data/watchlist.json"
-    OldWatchlistPath = "data/old-watchlist.json"
-    UpdatesWatchlistPath = "data/updates-watchlist.json"
-    ProviderlistPath = "data/providerlist.json"
+    WATCHLIST_PATH = "data/watchlist.json"
+    OLD_WATCHLIST_PATH = "data/old-watchlist.json"
+    UPDATES_WATCHLIST_PATH = "data/updates-watchlist.json"
+    PROVIDERLIST_PATH = "data/providerlist.json"
 
     class << self
       def run
@@ -21,10 +21,10 @@ module Lebowski
           })
         end
 
-        File.write(site_path(WatchlistPath), watchlist.to_json(pretty: true))
-        File.write(site_path(ProviderlistPath), providerlist.to_json(pretty: true))
-        File.write(site_path(OldWatchlistPath), old_watchlist.to_json(pretty: true))
-        File.write(site_path(UpdatesWatchlistPath), JSON.pretty_generate(updates_watchlist))
+        File.write(site_path(WATCHLIST_PATH), watchlist.to_json(pretty: true))
+        File.write(site_path(PROVIDERLIST_PATH), providerlist.to_json(pretty: true))
+        File.write(site_path(OLD_WATCHLIST_PATH), old_watchlist.to_json(pretty: true))
+        File.write(site_path(UPDATES_WATCHLIST_PATH), JSON.pretty_generate(updates_watchlist))
       end
 
       def watchlist
@@ -36,11 +36,11 @@ module Lebowski
       end
 
       def updates_watchlist
-        @updates_watchlist ||= fetch(UpdatesWatchlistPath, default: [])
+        @updates_watchlist ||= fetch(UPDATES_WATCHLIST_PATH, default: [])
       end
 
       def old_watchlist
-        @old_watchlist ||= Lebowski::Watchlist.new(fetch(WatchlistPath, default: []))
+        @old_watchlist ||= Lebowski::Watchlist.new(fetch(WATCHLIST_PATH, default: []))
       end
 
       def fetch(path, default: nil)

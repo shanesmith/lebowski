@@ -2,7 +2,7 @@ require 'faraday'
 
 module Lebowski
   class TMDB
-    AccessToken = ENV['TMDB_ACCESS_TOKEN']
+    ACCESS_TOKEN = ENV['TMDB_ACCESS_TOKEN']
 
     class <<self
 
@@ -41,7 +41,7 @@ module Lebowski
 
       def conn
         @conn ||= Faraday.new("https://api.themoviedb.org") do |conn|
-          conn.request :authorization, 'Bearer', AccessToken
+          conn.request :authorization, 'Bearer', ACCESS_TOKEN
           conn.request :json
 
           conn.response :json

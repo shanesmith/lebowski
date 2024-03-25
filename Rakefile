@@ -2,7 +2,7 @@ $LOAD_PATH.unshift(File.expand_path("../lib/", __FILE__))
 
 require "lebowski"
 
-github_conn = Faraday.new(Lebowski::Generate::GithubHost) do |conn|
+github_conn = Faraday.new(Lebowski::Generate::GITHUB_HOST) do |conn|
   conn.response :json
   conn.response :raise_error
 end
@@ -10,10 +10,10 @@ end
 
 namespace "fetch" do
   fetch_map = {
-    watchlist:           Lebowski::Generate::WatchlistPath,
-    providerlist:        Lebowski::Generate::ProviderlistPath,
-    'old-watchlist':     Lebowski::Generate::OldWatchlistPath,
-    'updates-watchlist': Lebowski::Generate::UpdatesWatchlistPath,
+    watchlist:           Lebowski::Generate::WATCHLIST_PATH,
+    providerlist:        Lebowski::Generate::PROVIDERLIST_PATH,
+    'old-watchlist':     Lebowski::Generate::OLD_WATCHLIST_PATH,
+    'updates-watchlist': Lebowski::Generate::UPDATES_WATCHLIST_PATH,
   }
 
   task all: fetch_map.keys

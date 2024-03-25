@@ -1,15 +1,10 @@
 module Lebowski
   class Providerlist
-    Subscribed = [
-      "Netflix",
-      "Amazon Prime Video"
-    ]
-
-    AdsAllow = [
+    ADS_ALLOW = [
       "CBC Gem",
     ]
 
-    Group = {
+    GROUP = {
       "Starz" => [
         "Crave Starz",
         "Starz Amazon Channel"
@@ -86,7 +81,7 @@ module Lebowski
 
         list += (movie.dig("providers", "ads") || [])
           .each { |p| p["provider_name"].strip! }
-          .select { |p| AdsAllow.include?(p["provider_name"]) }
+          .select { |p| ADS_ALLOW.include?(p["provider_name"]) }
 
         item = {
           **movie["movie"],
@@ -115,7 +110,7 @@ module Lebowski
         end
       end
 
-      Group.each do |name,members|
+      GROUP.each do |name,members|
         name = "*#{name}"
         result[name] = []
         members.each do |m|
@@ -139,7 +134,7 @@ module Lebowski
         .map do |provider, movies|
           {
             "provider" => provider.delete_prefix('*'),
-            "group" => provider.start_with?("*") ? Group[provider[1..]] : nil,
+            "group" => provider.start_with?("*") ? GROUP[provider[1..]] : nil,
             "movies" => movies.sort_by { |m| m["other_providers"].size },
           }
         end

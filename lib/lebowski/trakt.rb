@@ -4,9 +4,9 @@ require 'faraday'
 
 module Lebowski
   class Trakt
-    ClientId = ENV['TRAKT_CLIENT_ID']
-    ClientSecret = ENV['TRAKT_CLIENT_SECRET']
-    AccessToken = ENV['TRAKT_ACCESS_TOKEN']
+    CLIENT_ID = ENV['TRAKT_CLIENT_ID']
+    CLIENT_SECRET = ENV['TRAKT_CLIENT_SECRET']
+    ACCESS_TOKEN = ENV['TRAKT_ACCESS_TOKEN']
 
     class <<self
 
@@ -29,10 +29,10 @@ module Lebowski
 
       def conn
         @conn ||= Faraday.new("https://api.trakt.tv") do |conn|
-          conn.headers['trakt-api-key'] = ClientId
+          conn.headers['trakt-api-key'] = CLIENT_ID
           conn.headers['trakt-api-version'] = "2"
 
-          conn.request :authorization, 'Bearer', AccessToken
+          conn.request :authorization, 'Bearer', ACCESS_TOKEN
           conn.request :json
 
           conn.response :json
