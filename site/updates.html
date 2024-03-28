@@ -107,10 +107,10 @@
             <ul class="mt-0 movies">
               <li v-for="movie in updateList.updates">
                 <div>
-                  <!-- <a :href="movie.link" target="_blank"> -->
+                  <a :href="movieLink(movie)" target="_blank">
                     {{movie.movie.title}}
                     <span class="has-text-grey has-text-weight-light is-size-7">({{movie.movie.year}})</span>
-                  <!-- </a> -->
+                  </a>
                 </div>
                 <div>
                   <template v-for="diff in movie.diff">
@@ -178,7 +178,10 @@
             hour: "numeric",
             minute: "numeric",
           })
-        }
+        },
+        movieLink(movie) {
+          return `https://www.themoviedb.org/movie/${movie.movie.ids.tmdb}/watch?locale=CA`
+        },
       },
       created: function() {
         fetch("./data/updates-watchlist.json")
