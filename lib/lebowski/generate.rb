@@ -15,10 +15,14 @@ module Lebowski
     class << self
       def run
         unless old_watchlist.value.empty?
-          updates_watchlist.prepend({
-            "time" => Time.now.to_s,
-            "updates" => old_watchlist.diff(watchlist).value,
-          })
+          new_updates = old_watchlist.diff(watchlist)
+
+          unless new_updates.value.empty?
+            updates_watchlist.prepend({
+              "time" => Time.now.to_s,
+              "updates" => new_updates.value,
+            })
+          end
         end
 
         File.write(site_path(WATCHLIST_PATH), watchlist.to_json(pretty: true))
