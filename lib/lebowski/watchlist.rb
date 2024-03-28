@@ -35,9 +35,10 @@ module Lebowski
 
         movie["providers"] = Lebowski::TMDB.providers(id)
 
-        movie.dig("providers", "flatrate").tap do |flatrate|
-          next if flatrate.nil?
+        flatrate = movie.dig("providers", "flatrate")
+        unless flatrate.nil?
           flatrate.reject! { |p| IGNORE_PROVIDERS.include?(p["provider_name"])}
+          movie["providers"].delete("flatrate") if flatrate.empty?
         end
       end
     end
