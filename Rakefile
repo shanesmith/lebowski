@@ -7,7 +7,6 @@ github_conn = Faraday.new(Lebowski::Generate::GITHUB_HOST) do |conn|
   conn.response :raise_error
 end
 
-
 namespace "fetch" do
   fetch_map = {
     watchlist:           Lebowski::Generate::WATCHLIST_PATH,
@@ -19,8 +18,8 @@ namespace "fetch" do
   task all: fetch_map.keys
 
   fetch_map.each do |name, path|
-    puts "fetching #{name}"
     task name do
+      puts "fetching #{name}"
       File.write(
         Lebowski::Generate.site_path(path),
         github_conn.get(path).body.to_json
