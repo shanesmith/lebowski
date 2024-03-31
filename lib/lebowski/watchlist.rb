@@ -50,6 +50,8 @@ module Lebowski
     def diff(other_list)
       diff_list = []
 
+      is_unavailable = ->(providers) { providers.nil? || ['flatrate', 'rent', 'buy'].none? { |type| providers.key?(type) }  }
+
       @watchlist.each do |movie|
         other_movie = other_list.find_movie(movie['id'])
 
@@ -66,8 +68,8 @@ module Lebowski
         providers = movie["providers"]
         other_providers = other_movie["providers"]
 
-        if providers.nil?
-          if other_providers.nil?
+        if is_unavailable.call(providers)
+          if is_unavailable.call(other_providers)
             next
           end
 
@@ -153,6 +155,7 @@ module Lebowski
           else
             next
           end
+
         end
 
         diff_list << diff_movie
