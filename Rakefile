@@ -22,7 +22,7 @@ namespace "fetch" do
       puts "fetching #{name}"
       File.write(
         Lebowski::Generate.site_path(path),
-        github_conn.get(path).body.to_json
+        JSON.pretty_generate(github_conn.get(path).body)
       )
     end
   end
