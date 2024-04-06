@@ -51,6 +51,7 @@ module Lebowski
       diff_list = []
 
       is_unavailable = ->(providers) { providers.nil? || ['flatrate', 'rent', 'buy'].none? { |type| providers.key?(type) }  }
+      provider_difference = ->(from, to) { from.reject { |f| to.find { |t| t['provider_name'] == f['provider_name'] } } }
 
       @watchlist.each do |movie|
         other_movie = other_list.find_movie(movie['id'])
@@ -88,8 +89,8 @@ module Lebowski
             diff_movie['diff'] << { op: 'remove', type: 'providers', providers: providers['flatrate'] }
             diff_movie['diff'] << { op: 'add', type: 'unavailable' }
           elsif other_providers['flatrate']
-            added = other_providers['flatrate'].difference(providers['flatrate'])
-            removed = providers['flatrate'].difference(other_providers['flatrate'])
+            added = provider_difference.call(other_providers['flatrate'], providers['flatrate'])
+            removed = provider_difference.call(providers['flatrate'], other_providers['flatrate'])
 
             next if added.empty? && removed.empty?
 
