@@ -1,4 +1,4 @@
-# ![The Dude](https://shanesmith.github.io/lebowski/the_dude.png) [Lebowski](https://shanesmith.github.io/lebowski)
+# ![The Dude](https://shanesmith.github.io/lebowski/assets/the_dude.png) [Lebowski](https://shanesmith.github.io/lebowski)
 
 _This app really ties the room together._
 
