@@ -147,9 +147,14 @@ module Lebowski
           }
         end
         .sort_by do |elem|
-          # unique movie count
-          score = elem["movies"].filter { |m| m["other_providers"].empty? }.size
-          score += 1000 if elem["subscribed"]
+          # 999,999,999
+          #  |   |   ^ total movies
+          #  |   ^ unique movies
+          #  ^ subscribed
+          score = 0
+          score += 10000 if elem["subscribed"]
+          score += elem["movies"].filter { |m| m["other_providers"].empty? }.size * 100
+          score += elem["movies"].size
           score
         end
         .reverse
