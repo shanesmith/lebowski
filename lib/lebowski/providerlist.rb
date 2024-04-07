@@ -4,6 +4,11 @@ module Lebowski
       "CBC Gem",
     ]
 
+    SUBSCRIBED = [
+      "Netflix",
+      "Hollywood Suite Amazon Channel",
+    ]
+
     GROUP = {
       "Starz" => [
         "Crave Starz",
@@ -132,13 +137,21 @@ module Lebowski
 
       result = result
         .map do |provider, movies|
+          name = provider.delete_prefix('*')
+          group = provider.start_with?("*") ? GROUP[provider[1..]] : nil
           {
-            "provider" => provider.delete_prefix('*'),
-            "group" => provider.start_with?("*") ? GROUP[provider[1..]] : nil,
+            "provider" => name,
+            "group" => group,
             "movies" => movies.sort_by { |m| m["other_providers"].size },
+            "subscribed" => [name, *group].any? { |p| SUBSCRIBED.include?(p) }
           }
         end
-        .sort_by { |elem| elem["movies"].filter { |m| m["other_providers"].empty? }.size }
+        .sort_by do |elem|
+          # unique movie count
+          score = elem["movies"].filter { |m| m["other_providers"].empty? }.size
+          score += 1000 if elem["subscribed"]
+          score
+        end
         .reverse
 
       {

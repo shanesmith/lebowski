@@ -69,6 +69,10 @@
     a.has-text-grey:hover {
       color: #7957d5 !important;
     }
+
+    .subscribed:has(+ :not(.subscribed)) {
+      margin-bottom: 2em;
+    }
   </style>
 </head>
 <body>
@@ -95,7 +99,7 @@
           animation="slide"
           v-for="provider in list.stream"
           :key="providerKey(provider)"
-          :class="{ opened: isOpen == providerKey(provider) }"
+          :class="{ opened: isOpen == providerKey(provider), subscribed: provider.subscribed }"
           :open="isOpen == providerKey(provider)"
           @open="isOpen = providerKey(provider)">
           <template #trigger="props">
