@@ -6,7 +6,7 @@ module Lebowski
 
     SUBSCRIBED = [
       "Netflix",
-      "Hollywood Suite Amazon Channel",
+      "Crave",
     ]
 
     GROUP = {
