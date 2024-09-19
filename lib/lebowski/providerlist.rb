@@ -9,10 +9,6 @@ module Lebowski
       "Crave",
     ]
 
-    IGNORE = [
-      "Amazon Prime Video with Ads"
-    ]
-
     GROUP = {
       "Starz" => [
         "Crave Starz",
@@ -87,7 +83,6 @@ module Lebowski
 
         list += (movie.dig("providers", "flatrate") || [])
           .each { |p| p["provider_name"].strip! }
-          .reject { |p| IGNORE.include?(p["provider_name"]) }
 
         list += (movie.dig("providers", "ads") || [])
           .each { |p| p["provider_name"].strip! }

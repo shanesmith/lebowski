@@ -5,6 +5,7 @@ module Lebowski
       "Hoopla",
       "Club Illico",
       "iciTouTV",
+      "Amazon Prime Video with Ads",
     ]
 
     @watchlist = nil
