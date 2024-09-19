@@ -87,7 +87,7 @@ module Lebowski
 
         list += (movie.dig("providers", "flatrate") || [])
           .each { |p| p["provider_name"].strip! }
-          .filter { |p| IGNORE.include?(p["provider_name"]) }
+          .reject { |p| IGNORE.include?(p["provider_name"]) }
 
         list += (movie.dig("providers", "ads") || [])
           .each { |p| p["provider_name"].strip! }
