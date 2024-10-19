@@ -6,7 +6,7 @@ module Lebowski
 
     SUBSCRIBED = [
       "Netflix",
-      "Apple TV Plus",
+      "Hollywood Suite",
       "Disney Plus",
     ]
 
