@@ -21,7 +21,7 @@ module Lebowski
       #       "ids"=>{
       #         "trakt"=>820070,
       #         "slug"=>"hundreds-of-beavers-2024",
-      #         "imdb"=>"tt12818328", 
+      #         "imdb"=>"tt12818328",
       #         "tmdb"=>1019939}}},
       def watchlist
         conn.get("/users/me/watchlist/movies/added").body
