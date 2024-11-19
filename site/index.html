@@ -92,7 +92,11 @@
     </section>
 
     <section class="section">
-      <div id="auth"></div>
+      <div v-show="!user" id="auth"></div>
+      <div v-if="user">
+        {{user.email}}
+        <a @click="logout">Logout</a>
+      </div>
     </section>
 
     <section class="section pt-4">
@@ -200,12 +204,14 @@
   <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.js"></script>
+
+  <script src="https://unpkg.com/vue@2"></script>
+  <script src="https://unpkg.com/buefy/dist/buefy.min.js"></script>
   <script type="module">
-    // Import the functions you need from the SDKs you need
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
     import { getAuth } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js'
 
-    const app = initializeApp({
+    initializeApp({
       apiKey: "AIzaSyBMMF8xaGjf3_XEAKgtb7ROvuwEWrugmZU",
       authDomain: "lebowski-6b59e.firebaseapp.com",
       projectId: "lebowski-6b59e",
@@ -214,28 +220,14 @@
       appId: "1:628236044167:web:aa3465fd334d5c7e8af522"
     });
 
-    var ui = new firebaseui.auth.AuthUI(getAuth());
-    ui.start('#auth', {
+    var authUI = new firebaseui.auth.AuthUI(getAuth());
+    authUI.start('#auth', {
       signInOptions: [
-        {
-          provider: firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-          clientId: '628236044167-l9dgqksb8k2krl8i4jfvre40n7t9t2d1.apps.googleusercontent.com',
-        }
+        firebase.auth.GoogleAuthProvider.PROVIDER_ID,
       ],
       signInFlow: 'popup',
-      callbacks: {
-        signInSuccessWithAuthResult: function(authResult, redirectUrl) {
-          console.log("SUCCESS!");
-          console.log(authResult);
-          return false;
-        },
-      }
     });
-  </script>
 
-  <script src="https://unpkg.com/vue@2"></script>
-  <script src="https://unpkg.com/buefy/dist/buefy.min.js"></script>
-  <script>
     new Vue({
       el: '#app',
       data: {
@@ -243,6 +235,7 @@
         isOpen: "",
         otherTypes: ["rent", "buy", "unavailable"],
         lastUpdate: null,
+        user: null,
       },
       methods: {
         timeFormat(time) {
@@ -258,6 +251,9 @@
         },
         providerKey(provider) {
           return `${provider.provider}${provider.group == null ? '' : '-group'}`
+        },
+        logout() {
+          getAuth().signOut();
         }
       },
       created: function() {
@@ -268,6 +264,8 @@
         fetch("./data/updates-watchlist.json")
           .then(response => response.json())
           .then(json => this.lastUpdate = json[0].time)
+
+        getAuth().onAuthStateChanged(user => this.user = user);
       }
     })
   </script>
