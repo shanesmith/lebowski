@@ -96,7 +96,8 @@
     </section>
 
     <section class="section">
-      <div v-show="!user" id="auth"></div>
+      <!-- <div v-show="!user" id="auth"></div> -->
+      <div v-if="!user"><button @click="login">Sign In</button></div>
       <div v-if="user">
         {{user.email}}
         <a @click="logout">Logout</a>
@@ -210,7 +211,7 @@
   <script src="https://unpkg.com/buefy/dist/buefy.min.js"></script>
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-    import { getAuth } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js'
+    import { getAuth, GoogleAuthProvider, signInWithPopup } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js'
 
     initializeApp({
       apiKey: "AIzaSyBMMF8xaGjf3_XEAKgtb7ROvuwEWrugmZU",
@@ -223,13 +224,15 @@
 
     const auth = getAuth();
 
-    const authUI = new firebaseui.auth.AuthUI(auth);
-    authUI.start('#auth', {
-      signInOptions: [
-        firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-      ],
-      signInFlow: 'popup',
-    });
+    const provider = new GoogleAuthProvider();
+
+    // const authUI = new firebaseui.auth.AuthUI(auth);
+    // authUI.start('#auth', {
+    //   signInOptions: [
+    //     firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+    //   ],
+    //   signInFlow: 'popup',
+    // });
 
     new Vue({
       el: '#app',
@@ -257,6 +260,9 @@
         },
         logout() {
           auth.signOut();
+        },
+        login() {
+          signInWithPopup(auth, provider).then(result => this.user = result.user);
         }
       },
       created: function() {
