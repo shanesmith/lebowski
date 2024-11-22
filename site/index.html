@@ -105,25 +105,35 @@
   <div id="app">
 
     <section class="section">
-      <div class="container is-max-desktop is-flex is-align-items-center">
-        <img src="assets/the_dude.png" id="the_dude" />
-        <div>
-          <h1 class="title ml-5">Lebowski</h1>
-          <h2 class="subtitle ml-5">Where's the movies, Lebowski?</h2>
-        </div>
-      </div>
-    </section>
 
-    <section class="section">
-      <!-- <div v-show="!user" id="auth"></div> -->
-      <div v-if="!user"><button @click="login">Sign In</button></div>
-      <div v-if="user">
-        {{user.email}}
-        <a @click="logout">Logout</a>
+      <div class="container is-max-desktop is-flex is-align-items-start is-flex-wrap-wrap-reverse">
+        <div class="is-flex is-align-items-center">
+          <img src="assets/the_dude.png" id="the_dude" />
+          <div>
+            <h1 class="title ml-5">Lebowski</h1>
+            <h2 class="subtitle ml-5">Where's the movies, Lebowski?</h2>
+          </div>
+        </div>
+
+        <div class="ml-auto" style="margin-top: -20px; margin-bottom: 20px;">
+          <div v-if="!user"><b-button type="is-primary" @click="login">Sign In</button></div>
+          <div v-if="user">
+            <b-dropdown
+              position="is-bottom-left">
+              <template #trigger="{ active }">
+                <b-button
+                  :label="user.displayName"
+                  icon-right="menu-down"
+                  outlined />
+              </template>
+
+              <b-dropdown-item @click="logout">Sign Out</b-dropdown-item>
+            </b-dropdown>
+          </div>
+        </div>
+
       </div>
-      <div>
-        subscribed: {{subscribed}}
-      </div>
+
     </section>
 
     <section class="section pt-4">
@@ -296,6 +306,9 @@
       },
       watch: {
         subscribed(value) {
+          if (!this.user) {
+            return;
+          }
           updateDoc(this.userPrefsRef(), {
             subscribed: value,
           })
