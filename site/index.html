@@ -8,15 +8,12 @@
 
   <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/11.0.2/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.js"></script>
 
   <!-- https://favicon.io -->
   <link rel="apple-touch-icon" sizes="180x180" href="assets/favicon/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon/favicon-16x16.png">
   <link rel="manifest" href="site.webmanifest">
-
-  <link type="text/css" rel="stylesheet" href="https://www.gstatic.com/firebasejs/ui/6.0.1/firebase-ui-auth.css" />
 
   <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@5.8.55/css/materialdesignicons.min.css">
@@ -79,6 +76,28 @@
     .subscribed:has(+ :not(.subscribed)) {
       margin-bottom: 2em;
     }
+
+    .subscribed-star {
+      visibility: hidden;
+    }
+
+    .card:hover .subscribed-star,
+    .card.opened .subscribed-star,
+    .subscribed-star:has(input[type=checkbox]:checked) {
+      visibility: visible;
+    }
+
+    .checkbox.subscribed-star .check {
+      display: none;
+    }
+
+    .checkbox.subscribed-star .control-label {
+      padding-left: 0;
+    }
+
+    .subscribed-star:hover {
+       text-shadow: 0 0 2px #aaa;
+    }
   </style>
 </head>
 <body>
@@ -101,6 +120,9 @@
       <div v-if="user">
         {{user.email}}
         <a @click="logout">Logout</a>
+      </div>
+      <div>
+        subscribed: {{subscribed}}
       </div>
     </section>
 
@@ -136,6 +158,11 @@
                   <span class="ml-1 has-text-weight-normal has-text-grey">{{provider.movies.length}}</span>
                 </span>
               </p>
+              <a class="card-header-icon" @click="stopProp">
+                <b-checkbox :native-value="provider.provider" v-model="subscribed" :disabled="!user" class="subscribed-star">
+                  <b-icon :icon="isSubscribed(provider.provider) ? 'star' : 'star-outline'" type="is-info-dark"></b-icon>
+                </b-checkbox>
+              </a>
               <a class="card-header-icon">
                 <b-icon :icon="props.open ? 'menu-up' : 'menu-down'"></b-icon>
               </a>
@@ -212,6 +239,7 @@
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
     import { getAuth, GoogleAuthProvider, signInWithPopup } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js'
+    import { collection, doc, getDoc, setDoc, updateDoc, getFirestore } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js'
 
     initializeApp({
       apiKey: "AIzaSyBMMF8xaGjf3_XEAKgtb7ROvuwEWrugmZU",
@@ -226,13 +254,7 @@
 
     const provider = new GoogleAuthProvider();
 
-    // const authUI = new firebaseui.auth.AuthUI(auth);
-    // authUI.start('#auth', {
-    //   signInOptions: [
-    //     firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-    //   ],
-    //   signInFlow: 'popup',
-    // });
+    const db = getFirestore();
 
     new Vue({
       el: '#app',
@@ -242,6 +264,7 @@
         otherTypes: ["rent", "buy", "unavailable"],
         lastUpdate: null,
         user: auth.currentUser,
+        subscribed: [],
       },
       methods: {
         timeFormat(time) {
@@ -263,6 +286,19 @@
         },
         login() {
           signInWithPopup(auth, provider).then(result => this.user = result.user);
+        },
+        userPrefsRef() {
+          return doc(db, 'users', this.user.uid);
+        },
+        isSubscribed(provider) {
+          return this.subscribed.includes(provider);
+        }
+      },
+      watch: {
+        subscribed(value) {
+          updateDoc(this.userPrefsRef(), {
+            subscribed: value,
+          })
         }
       },
       created: function() {
@@ -274,7 +310,23 @@
           .then(response => response.json())
           .then(json => this.lastUpdate = json[0].time)
 
-        auth.onAuthStateChanged(user => this.user = user);
+        auth.onAuthStateChanged(user => {
+          this.user = user;
+
+          if (!user) {
+            this.subscribed = [];
+            return;
+          }
+
+          getDoc(this.userPrefsRef())
+            .then(docSnapshot => {
+               if (!docSnapshot.exists()) {
+                setDoc(this.userPrefsRef(), {});
+                return;
+               }
+               this.subscribed = docSnapshot.data().subscribed;
+            });
+        });
       }
     })
   </script>
