@@ -73,8 +73,8 @@
       color: #7957d5 !important;
     }
 
-    .subscribed:has(+ :not(.subscribed)) {
-      margin-bottom: 2em;
+    .subscriptionSplit {
+      margin-top: 2em;
     }
 
     .subscribed-star {
@@ -144,9 +144,9 @@
         <b-collapse
           class="card"
           animation="slide"
-          v-for="provider in list.stream"
+          v-for="(provider, providerIndex) in list.stream"
           :key="providerKey(provider)"
-          :class="{ opened: isOpen == providerKey(provider), subscribed: provider.subscribed }"
+          :class="{ opened: isOpen == providerKey(provider), subscribed: isSubscribed(provider.provider), subscriptionSplit: providerIndex == subscriptionSplitCount }"
           :open="isOpen == providerKey(provider)"
           @open="isOpen = providerKey(provider)">
           <template #trigger="props">
@@ -244,7 +244,6 @@
 
   </div>
 
-
   <script src="https://unpkg.com/vue@2"></script>
   <script src="https://unpkg.com/buefy/dist/buefy.min.js"></script>
   <script type="module">
@@ -276,6 +275,7 @@
         lastUpdate: null,
         user: auth.currentUser,
         subscribed: [],
+        subscriptionSplitCount: null,
       },
       methods: {
         timeFormat(time) {
@@ -303,6 +303,29 @@
         },
         isSubscribed(provider) {
           return this.subscribed.includes(provider);
+        },
+        sortStreamProviders() {
+          if (!this.list.stream) {
+            return;
+          }
+
+
+          this.list = {
+            ...this.list,
+            stream: this.list.stream.sort((a, b) => {
+              var aScore = a.movies.length;
+              var bScore = b.movies.length;
+
+              if (this.isSubscribed(a.provider)) {
+                aScore += 100;
+              }
+              if (this.isSubscribed(b.provider)) {
+                bScore += 100;
+              }
+
+              return bScore - aScore;
+            })
+          }
         }
       },
       watch: {
@@ -319,6 +342,7 @@
         fetch("./data/providerlist.json")
           .then(response => response.json())
           .then(json => this.list = json)
+          .then(() => this.sortStreamProviders())
 
         fetch("./data/updates-watchlist.json")
           .then(response => response.json())
@@ -329,6 +353,8 @@
 
           if (!user) {
             this.subscribed = [];
+            this.subscriptionSplitCount = this.subscribed.length;
+            this.sortStreamProviders();
             return;
           }
 
@@ -339,6 +365,8 @@
                 return;
                }
                this.subscribed = docSnapshot.data().subscribed;
+               this.subscriptionSplitCount = this.subscribed.length;
+               this.sortStreamProviders();
             });
         });
       }
