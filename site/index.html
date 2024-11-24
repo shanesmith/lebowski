@@ -167,6 +167,15 @@
                   <span class="ml-1 has-text-weight-normal has-text-grey-light">|</span>
                   <span class="ml-1 has-text-weight-normal has-text-grey">{{provider.movies.length}}</span>
                 </span>
+                <span class="ml-auto" v-if="isSubscribed(providerKey(provider))" @click.stop="picker(providerIndex)">
+                  <b-datepicker :ref="`datepicker-${providerIndex}`" v-model="subscriptionLastDay" :mobile-native="false" append-to-body>
+                    <template #trigger="props">
+                      <span class="tag is-rounded has-text-weight-normal">
+                        {{subscriptionLastDay ? dateFormat(subscriptionLastDay) : "∞"}}
+                      </span>
+                    </template>
+                  </b-datepicker>
+                </span>
               </p>
               <a class="card-header-icon" @click="stopProp">
                 <b-checkbox :native-value="providerKey(provider)" v-model="subscribed" :disabled="!user" class="subscribed-star">
@@ -266,7 +275,7 @@
 
     const db = getFirestore();
 
-    new Vue({
+    window.app = new Vue({
       el: '#app',
       data: {
         list: {},
@@ -276,14 +285,24 @@
         user: auth.currentUser,
         subscribed: [],
         subscriptionSplitCount: null,
+        subscriptionLastDay: null,
       },
       methods: {
+        picker(index) {
+          this.$refs[`datepicker-${index}`][0].toggle();
+        },
         timeFormat(time) {
           return new Date(time).toLocaleString(undefined, {
             month: "short",
             day: "numeric",
             hour: "numeric",
             minute: "numeric",
+          })
+        },
+        dateFormat(time) {
+          return new Date(time).toLocaleString(undefined, {
+            month: "short",
+            day: "numeric",
           })
         },
         stopProp(event) {
