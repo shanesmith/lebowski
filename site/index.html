@@ -146,7 +146,7 @@
           animation="slide"
           v-for="(provider, providerIndex) in list.stream"
           :key="providerKey(provider)"
-          :class="{ opened: isOpen == providerKey(provider), subscribed: isSubscribed(provider.provider), subscriptionSplit: providerIndex == subscriptionSplitCount }"
+          :class="{ opened: isOpen == providerKey(provider), subscribed: isSubscribed(providerKey(provider)), subscriptionSplit: providerIndex == subscriptionSplitCount }"
           :open="isOpen == providerKey(provider)"
           @open="isOpen = providerKey(provider)">
           <template #trigger="props">
@@ -169,8 +169,8 @@
                 </span>
               </p>
               <a class="card-header-icon" @click="stopProp">
-                <b-checkbox :native-value="provider.provider" v-model="subscribed" :disabled="!user" class="subscribed-star">
-                  <b-icon :icon="isSubscribed(provider.provider) ? 'star' : 'star-outline'" type="is-info-dark"></b-icon>
+                <b-checkbox :native-value="providerKey(provider)" v-model="subscribed" :disabled="!user" class="subscribed-star">
+                  <b-icon :icon="isSubscribed(providerKey(provider)) ? 'star' : 'star-outline'" type="is-info-dark"></b-icon>
                 </b-checkbox>
               </a>
               <a class="card-header-icon">
@@ -309,17 +309,16 @@
             return;
           }
 
-
           this.list = {
             ...this.list,
             stream: this.list.stream.sort((a, b) => {
               var aScore = a.movies.length;
               var bScore = b.movies.length;
 
-              if (this.isSubscribed(a.provider)) {
+              if (this.isSubscribed(this.providerKey(a))) {
                 aScore += 100;
               }
-              if (this.isSubscribed(b.provider)) {
+              if (this.isSubscribed(this.providerKey(b))) {
                 bScore += 100;
               }
 
