@@ -171,7 +171,8 @@
                   <b-datepicker :ref="`datepicker-${providerIndex}`" v-model="subscriptionLastDay" :mobile-native="false" append-to-body>
                     <template #trigger="props">
                       <span class="tag is-rounded has-text-weight-normal">
-                        {{subscriptionLastDay ? dateFormat(subscriptionLastDay) : "∞"}}
+                        <template v-if="subscriptionLastDay">{{dateFormat(subscriptionLastDay)}}</template>
+                        <b-icon v-else icon='calendar' size="is-small" type="is-grey"></b-icon>
                       </span>
                     </template>
                   </b-datepicker>
