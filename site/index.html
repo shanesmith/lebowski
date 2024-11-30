@@ -257,7 +257,7 @@
   <script src="https://unpkg.com/vue@2"></script>
   <script src="https://unpkg.com/buefy/dist/buefy.min.js"></script>
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js"
     import { getAuth, GoogleAuthProvider, signInWithPopup } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js'
     import { collection, doc, getDoc, setDoc, updateDoc, getFirestore } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js'
 
@@ -268,13 +268,13 @@
       storageBucket: "lebowski-6b59e.firebasestorage.app",
       messagingSenderId: "628236044167",
       appId: "1:628236044167:web:aa3465fd334d5c7e8af522"
-    });
+    })
 
-    const auth = getAuth();
+    const auth = getAuth()
 
-    const provider = new GoogleAuthProvider();
+    const provider = new GoogleAuthProvider()
 
-    const db = getFirestore();
+    const db = getFirestore()
 
     window.app = new Vue({
       el: '#app',
@@ -290,7 +290,7 @@
       },
       methods: {
         picker(index) {
-          this.$refs[`datepicker-${index}`][0].toggle();
+          this.$refs[`datepicker-${index}`][0].toggle()
         },
         timeFormat(time) {
           return new Date(time).toLocaleString(undefined, {
@@ -313,36 +313,36 @@
           return `${provider.provider}${provider.group == null ? '' : '-group'}`
         },
         logout() {
-          auth.signOut();
+          auth.signOut()
         },
         login() {
-          signInWithPopup(auth, provider).then(result => this.user = result.user);
+          signInWithPopup(auth, provider).then(result => this.user = result.user)
         },
         userPrefsRef() {
-          return doc(db, 'users', this.user.uid);
+          return doc(db, 'users', this.user.uid)
         },
         isSubscribed(provider) {
-          return this.subscribed.includes(provider);
+          return this.subscribed.includes(provider)
         },
         sortStreamProviders() {
           if (!this.list.stream) {
-            return;
+            return
           }
 
           this.list = {
             ...this.list,
             stream: this.list.stream.sort((a, b) => {
-              var aScore = a.movies.length;
-              var bScore = b.movies.length;
+              var aScore = a.movies.length
+              var bScore = b.movies.length
 
               if (this.isSubscribed(this.providerKey(a))) {
-                aScore += 100;
+                aScore += 100
               }
               if (this.isSubscribed(this.providerKey(b))) {
-                bScore += 100;
+                bScore += 100
               }
 
-              return bScore - aScore;
+              return bScore - aScore
             })
           }
         }
@@ -350,7 +350,7 @@
       watch: {
         subscribed(value) {
           if (!this.user) {
-            return;
+            return
           }
           updateDoc(this.userPrefsRef(), {
             subscribed: value,
@@ -368,26 +368,26 @@
           .then(json => this.lastUpdate = json[0].time)
 
         auth.onAuthStateChanged(user => {
-          this.user = user;
+          this.user = user
 
           if (!user) {
-            this.subscribed = [];
-            this.subscriptionSplitCount = this.subscribed.length;
-            this.sortStreamProviders();
-            return;
+            this.subscribed = []
+            this.subscriptionSplitCount = this.subscribed.length
+            this.sortStreamProviders()
+            return
           }
 
           getDoc(this.userPrefsRef())
             .then(docSnapshot => {
                if (!docSnapshot.exists()) {
-                setDoc(this.userPrefsRef(), {});
-                return;
+                setDoc(this.userPrefsRef(), {})
+                return
                }
-               this.subscribed = docSnapshot.data().subscribed;
-               this.subscriptionSplitCount = this.subscribed.length;
-               this.sortStreamProviders();
-            });
-        });
+               this.subscribed = docSnapshot.data().subscribed
+               this.subscriptionSplitCount = this.subscribed.length
+               this.sortStreamProviders()
+            })
+        })
       }
     })
   </script>
