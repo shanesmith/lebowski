@@ -160,7 +160,7 @@
                   :label="provider.group.join(' / ')"
                   position="is-right"
                   type="is-light">
-                  <span class="tag is-rounded is-light mr-1" @click="stopProp"><b-icon icon="creation" size="is-small"></b-icon></span>
+                  <span class="tag is-rounded is-light mr-1" @click.stop><b-icon icon="creation" size="is-small"></b-icon></span>
                 </b-tooltip>
                 <span class="tag is-rounded">
                   <span>{{provider.movies.filter(m => m["other_providers"].length == 0).length}}</span>
@@ -178,7 +178,7 @@
                   </b-datepicker>
                 </span>
               </p>
-              <a class="card-header-icon" @click="stopProp">
+              <a class="card-header-icon" @click.stop>
                 <b-checkbox :native-value="providerKey(provider)" v-model="subscribed" :disabled="!user" class="subscribed-star">
                   <b-icon :icon="isSubscribed(providerKey(provider)) ? 'star' : 'star-outline'" type="is-info-dark"></b-icon>
                 </b-checkbox>
@@ -305,9 +305,6 @@
             month: "short",
             day: "numeric",
           })
-        },
-        stopProp(event) {
-          event.stopPropagation()
         },
         providerKey(provider) {
           return `${provider.provider}${provider.group == null ? '' : '-group'}`
