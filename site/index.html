@@ -168,10 +168,10 @@
                   <span class="ml-1 has-text-weight-normal has-text-grey">{{provider.movies.length}}</span>
                 </span>
                 <span class="ml-auto" v-if="isSubscribed(providerKey(provider))" @click.stop="picker(providerIndex)">
-                  <b-datepicker :ref="`datepicker-${providerIndex}`" v-model="subscriptionLastDay" :mobile-native="false" append-to-body>
+                  <b-datepicker :ref="`datepicker-${providerIndex}`" v-model="subscribedUntil[providerKey(provider)]" :mobile-native="false" append-to-body>
                     <template #trigger="props">
                       <span class="tag is-rounded has-text-weight-normal">
-                        <template v-if="subscriptionLastDay">{{dateFormat(subscriptionLastDay)}}</template>
+                        <template v-if="subscribedUntil[providerKey(provider)]">{{dateFormat(subscribedUntil[providerKey(provider)])}}</template>
                         <b-icon v-else icon='calendar' size="is-small" type="is-grey"></b-icon>
                       </span>
                     </template>
@@ -286,7 +286,7 @@
         user: auth.currentUser,
         subscribed: [],
         subscriptionSplitCount: null,
-        subscriptionLastDay: null,
+        subscribedUntil: {},
       },
       methods: {
         picker(index) {
@@ -307,7 +307,7 @@
           })
         },
         providerKey(provider) {
-          return `${provider.provider}${provider.group == null ? '' : '-group'}`
+          return `${provider.provider}${provider.group === null ? '' : '-group'}`
         },
         logout() {
           auth.signOut()
@@ -352,6 +352,14 @@
           updateDoc(this.userPrefsRef(), {
             subscribed: value,
           })
+        },
+        subscribedUntil(value) {
+          if (!this.user) {
+            return
+          }
+          updateDoc(this.userPrefsRef(), {
+            subscribedUntil: value,
+          })
         }
       },
       created: function() {
@@ -369,7 +377,8 @@
 
           if (!user) {
             this.subscribed = []
-            this.subscriptionSplitCount = this.subscribed.length
+            this.subscribedUntil = {}
+            this.subscriptionSplitCount = 0
             this.sortStreamProviders()
             return
           }
@@ -380,7 +389,12 @@
                 setDoc(this.userPrefsRef(), {})
                 return
                }
-               this.subscribed = docSnapshot.data().subscribed
+               const data = docSnapshot.data()
+               this.subscribed = data.subscribed
+               this.subscribedUntil = {}
+               for (var p in data.subscribedUntil) {
+                 this.subscribedUntil[p] = data.subscribedUntil[p].toDate()
+               }
                this.subscriptionSplitCount = this.subscribed.length
                this.sortStreamProviders()
             })
