@@ -79,12 +79,14 @@
 
     .subscribed-star {
       visibility: hidden;
+      pointer-events: none;
     }
 
     .card:hover .subscribed-star,
     .card.opened .subscribed-star,
     .subscribed-star:has(input[type=checkbox]:checked) {
       visibility: visible;
+      margin-right: 0;
     }
 
     .checkbox.subscribed-star .check {
@@ -178,13 +180,13 @@
                   </b-datepicker>
                 </span>
               </p>
-              <a class="card-header-icon" @click.stop>
+              <a class="card-header-icon p-0" @click.stop>
                 <b-checkbox :native-value="providerKey(provider)" v-model="subscribed" :disabled="!user" class="subscribed-star">
                   <b-icon :icon="isSubscribed(providerKey(provider)) ? 'star' : 'star-outline'" type="is-info-dark"></b-icon>
                 </b-checkbox>
               </a>
               <a class="card-header-icon">
-                <b-icon :icon="props.open ? 'menu-up' : 'menu-down'"></b-icon>
+                <b-icon icon="dots-vertical" size="is-small"></b-icon>
               </a>
             </div>
           </template>
