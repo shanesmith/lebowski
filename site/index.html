@@ -170,27 +170,7 @@
                   <span class="ml-1 has-text-weight-normal has-text-grey-light">|</span>
                   <span class="ml-1 has-text-weight-normal has-text-grey">{{provider.movies.length}}</span>
                 </span>
-                <span class="ml-auto" v-if="isSubscribed(providerKey(provider))" @click.stop="togglePicker(providerIndex)">
-                  <b-datepicker :ref="`datepicker-${providerIndex}`" v-model="subscriptionRenewal[providerKey(provider)]" :mobile-native="false" append-to-body>
-                    <template #trigger="props">
-                      <span class="tag is-rounded has-text-weight-normal">
-                        <template v-if="subscriptionRenewal[providerKey(provider)]">{{dateFormat(subscriptionRenewal[providerKey(provider)])}}</template>
-                        <b-icon v-else icon='calendar' size="is-small" type="is-grey"></b-icon>
-                      </span>
-                    </template>
-
-                    <span class="is-flex is-align-items-center">
-                      <b-switch>Auto Renew</b-switch>
-                      <b-button
-                        label="Clear"
-                        type="is-light"
-                        icon-left="close"
-                        size="is-small"
-                        class="ml-auto"
-                        @click="subscriptionRenewal[providerKey(provider)] = null; togglePicker(providerIndex, false)" />
-                    </span>
-                  </b-datepicker>
-                </span>
+                <subscription-renewal-date-picker v-if="isSubscribed(providerKey(provider))" v-model="subscriptionRenewal[providerKey(provider)]"></subscription-renewal-date-picker>
               </p>
               <a class="card-header-icon p-0" @click.stop>
                 <b-checkbox :native-value="providerKey(provider)" v-model="subscribed" :disabled="!user" class="subscribed-star">
@@ -268,6 +248,30 @@
 
   </div>
 
+  <script type="text/x-template" id="subscription-renewal-date-picker-template">
+    <span class="ml-auto" @click.stop="toggle">
+      <b-datepicker ref="datepicker" v-model="computedDate" :mobile-native="false" append-to-body>
+        <template #trigger="props">
+          <span class="tag is-rounded has-text-weight-normal">
+            <template v-if="computedDate">{{formattedDate}}</template>
+            <b-icon v-else icon='calendar' size="is-small" type="is-grey"></b-icon>
+          </span>
+        </template>
+
+        <span class="is-flex is-align-items-center">
+          <b-switch>Auto Renew</b-switch>
+          <b-button
+            label="Clear"
+            type="is-light"
+            icon-left="close"
+            size="is-small"
+            class="ml-auto"
+            @click="computedDate = null; toggle(false)" />
+        </span>
+      </b-datepicker>
+    </span>
+  </script>
+
   <script src="https://unpkg.com/vue@2"></script>
   <script src="https://unpkg.com/buefy/dist/buefy.min.js"></script>
   <script type="module">
@@ -290,6 +294,47 @@
 
     const db = getFirestore()
 
+    Vue.component('subscription-renewal-date-picker', {
+      props: {
+        value: Object
+      },
+      data() {
+        return {
+          date: this.value?.date || null,
+          autoRenew: this.value?.autoRenew || false,
+        }
+      },
+      template: '#subscription-renewal-date-picker-template',
+      computed: {
+        computedDate: {
+          get() {
+            return this.date
+          },
+          set(date) {
+            this.date = date
+            this.emitValue()
+          }
+        },
+        formattedDate() {
+          return new Date(this.computedDate).toLocaleString(undefined, {
+            month: "short",
+            day: "numeric",
+          })
+        }
+      },
+      methods: {
+        emitValue() {
+          this.$emit('input', {
+            date: this.date,
+            autoRenew: this.autoRenew,
+          })
+        },
+        toggle(active) {
+          this.$refs.datepicker.toggle(active)
+        }
+      },
+    })
+
     window.app = new Vue({
       el: '#app',
       data: {
@@ -303,9 +348,6 @@
         subscriptionRenewal: {},
       },
       methods: {
-        togglePicker(index, active) {
-          this.$refs[`datepicker-${index}`][0].toggle(active)
-        },
         timeFormat(time) {
           return new Date(time).toLocaleString(undefined, {
             month: "short",
@@ -410,7 +452,11 @@
                this.subscribed = data.subscribed
                const subscriptionRenewal = {}
                for (var p in data.subscriptionRenewal) {
-                 subscriptionRenewal[p] = data.subscriptionRenewal[p]?.toDate() || null
+                 const renewal = data.subscriptionRenewal[p]
+                 subscriptionRenewal[p] = {
+                   date: renewal?.date?.toDate() || null,
+                   autoRenew: renewal?.autoRenew || false,
+                 }
                }
                this.subscriptionRenewal = subscriptionRenewal
                this.subscriptionSplitCount = this.subscribed.length
