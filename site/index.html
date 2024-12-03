@@ -253,20 +253,23 @@
       <b-datepicker ref="datepicker" v-model="computedDate" :mobile-native="false" append-to-body>
         <template #trigger="props">
           <span class="tag is-rounded has-text-weight-normal">
-            <template v-if="computedDate">{{formattedDate}}</template>
+            <template v-if="computedDate">
+              <span>{{formattedDate}}</span>
+              <b-icon icon="autorenew" size="is-small" v-if="computedAutoRenew"></b-icon>
+            </template>
             <b-icon v-else icon='calendar' size="is-small" type="is-grey"></b-icon>
           </span>
         </template>
 
         <span class="is-flex is-align-items-center">
-          <b-switch>Auto Renew</b-switch>
+          <b-switch v-model="computedAutoRenew">Auto Renew</b-switch>
           <b-button
             label="Clear"
             type="is-light"
             icon-left="close"
             size="is-small"
             class="ml-auto"
-            @click="computedDate = null; toggle(false)" />
+            @click="clear" />
         </span>
       </b-datepicker>
     </span>
@@ -313,6 +316,15 @@
           set(date) {
             this.date = date
             this.emitValue()
+          },
+        },
+        computedAutoRenew: {
+          get() {
+            return this.autoRenew
+          },
+          set(autoRenew) {
+            this.autoRenew = autoRenew
+            this.emitValue()
           }
         },
         formattedDate() {
@@ -331,6 +343,11 @@
         },
         toggle(active) {
           this.$refs.datepicker.toggle(active)
+        },
+        clear() {
+          this.date = null
+          this.autoRenew = false
+          this.emitValue()
         }
       },
     })
