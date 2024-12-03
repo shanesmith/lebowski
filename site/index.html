@@ -179,11 +179,16 @@
                       </span>
                     </template>
 
-                    <b-button
-                      label="Clear"
-                      type="is-light"
-                      icon-left="close"
-                      @click="subscriptionRenewal[providerKey(provider)] = null; togglePicker(providerIndex, false)" />
+                    <span class="is-flex is-align-items-center">
+                      <b-switch>Auto Renew</b-switch>
+                      <b-button
+                        label="Clear"
+                        type="is-light"
+                        icon-left="close"
+                        size="is-small"
+                        class="ml-auto"
+                        @click="subscriptionRenewal[providerKey(provider)] = null; togglePicker(providerIndex, false)" />
+                    </span>
                   </b-datepicker>
                 </span>
               </p>
