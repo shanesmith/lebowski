@@ -170,14 +170,20 @@
                   <span class="ml-1 has-text-weight-normal has-text-grey-light">|</span>
                   <span class="ml-1 has-text-weight-normal has-text-grey">{{provider.movies.length}}</span>
                 </span>
-                <span class="ml-auto" v-if="isSubscribed(providerKey(provider))" @click.stop="picker(providerIndex)">
-                  <b-datepicker :ref="`datepicker-${providerIndex}`" v-model="subscribedUntil[providerKey(provider)]" :mobile-native="false" append-to-body>
+                <span class="ml-auto" v-if="isSubscribed(providerKey(provider))" @click.stop="togglePicker(providerIndex)">
+                  <b-datepicker :ref="`datepicker-${providerIndex}`" v-model="subscriptionRenewal[providerKey(provider)]" :mobile-native="false" append-to-body>
                     <template #trigger="props">
                       <span class="tag is-rounded has-text-weight-normal">
-                        <template v-if="subscribedUntil[providerKey(provider)]">{{dateFormat(subscribedUntil[providerKey(provider)])}}</template>
+                        <template v-if="subscriptionRenewal[providerKey(provider)]">{{dateFormat(subscriptionRenewal[providerKey(provider)])}}</template>
                         <b-icon v-else icon='calendar' size="is-small" type="is-grey"></b-icon>
                       </span>
                     </template>
+
+                    <b-button
+                      label="Clear"
+                      type="is-light"
+                      icon-left="close"
+                      @click="subscriptionRenewal[providerKey(provider)] = null; togglePicker(providerIndex, false)" />
                   </b-datepicker>
                 </span>
               </p>
@@ -289,11 +295,11 @@
         user: auth.currentUser,
         subscribed: [],
         subscriptionSplitCount: null,
-        subscribedUntil: {},
+        subscriptionRenewal: {},
       },
       methods: {
-        picker(index) {
-          this.$refs[`datepicker-${index}`][0].toggle()
+        togglePicker(index, active) {
+          this.$refs[`datepicker-${index}`][0].toggle(active)
         },
         timeFormat(time) {
           return new Date(time).toLocaleString(undefined, {
@@ -356,13 +362,16 @@
             subscribed: value,
           })
         },
-        subscribedUntil(value) {
-          if (!this.user) {
-            return
+        subscriptionRenewal: {
+          deep: true,
+          handler(value) {
+            if (!this.user) {
+              return
+            }
+            updateDoc(this.userPrefsRef(), {
+              subscriptionRenewal: value,
+            })
           }
-          updateDoc(this.userPrefsRef(), {
-            subscribedUntil: value,
-          })
         }
       },
       created: function() {
@@ -380,7 +389,7 @@
 
           if (!user) {
             this.subscribed = []
-            this.subscribedUntil = {}
+            this.subscriptionRenewal = {}
             this.subscriptionSplitCount = 0
             this.sortStreamProviders()
             return
@@ -394,10 +403,11 @@
                }
                const data = docSnapshot.data()
                this.subscribed = data.subscribed
-               this.subscribedUntil = {}
-               for (var p in data.subscribedUntil) {
-                 this.subscribedUntil[p] = data.subscribedUntil[p].toDate()
+               const subscriptionRenewal = {}
+               for (var p in data.subscriptionRenewal) {
+                 subscriptionRenewal[p] = data.subscriptionRenewal[p]?.toDate() || null
                }
+               this.subscriptionRenewal = subscriptionRenewal
                this.subscriptionSplitCount = this.subscribed.length
                this.sortStreamProviders()
             })
