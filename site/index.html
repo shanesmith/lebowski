@@ -170,16 +170,13 @@
                   <span class="ml-1 has-text-weight-normal has-text-grey-light">|</span>
                   <span class="ml-1 has-text-weight-normal has-text-grey">{{provider.movies.length}}</span>
                 </span>
-                <subscription-renewal-date-picker v-if="isSubscribed(providerKey(provider))" v-model="subscriptionRenewal[providerKey(provider)]"></subscription-renewal-date-picker>
               </p>
-              <a class="card-header-icon p-0" @click.stop>
+              <p class="card-header-icon" @click.stop>
+                <subscription-renewal-date-picker v-if="isSubscribed(providerKey(provider))" v-model="subscriptionRenewal[providerKey(provider)]" class="mr-4"></subscription-renewal-date-picker>
                 <b-checkbox :native-value="providerKey(provider)" v-model="subscribed" :disabled="!user" class="subscribed-star">
                   <b-icon :icon="isSubscribed(providerKey(provider)) ? 'star' : 'star-outline'" type="is-info-dark"></b-icon>
                 </b-checkbox>
-              </a>
-              <a class="card-header-icon">
-                <b-icon icon="dots-vertical" size="is-small"></b-icon>
-              </a>
+              </p>
             </div>
           </template>
           <div class="card-content content">
@@ -249,30 +246,28 @@
   </div>
 
   <script type="text/x-template" id="subscription-renewal-date-picker-template">
-    <span class="ml-auto" @click.stop="toggle">
-      <b-datepicker ref="datepicker" v-model="computedDate" :mobile-native="false" append-to-body>
-        <template #trigger="props">
-          <span class="tag is-rounded has-text-weight-normal">
-            <template v-if="computedDate">
-              <span>{{formattedDate}}</span>
-              <b-icon icon="autorenew" size="is-small" v-if="computedAutoRenew"></b-icon>
-            </template>
-            <b-icon v-else icon='calendar' size="is-small" type="is-grey"></b-icon>
-          </span>
-        </template>
-
-        <span class="is-flex is-align-items-center">
-          <b-switch v-model="computedAutoRenew">Auto Renew</b-switch>
-          <b-button
-            label="Clear"
-            type="is-light"
-            icon-left="close"
-            size="is-small"
-            class="ml-auto"
-            @click="clear" />
+    <b-datepicker ref="datepicker" v-model="computedDate" :mobile-native="false" position="is-bottom-left" append-to-body>
+      <template #trigger="props">
+        <span class="tag is-rounded has-text-weight-normal">
+          <template v-if="computedDate">
+            <span>{{formattedDate}}</span>
+            <b-icon icon="autorenew" size="is-small" v-if="computedAutoRenew"></b-icon>
+          </template>
+          <b-icon v-else icon='calendar' size="is-small" type="is-grey"></b-icon>
         </span>
-      </b-datepicker>
-    </span>
+      </template>
+
+      <span class="is-flex is-align-items-center">
+        <b-switch v-model="computedAutoRenew">Auto Renew</b-switch>
+        <b-button
+          label="Clear"
+          type="is-light"
+          icon-left="close"
+          size="is-small"
+          class="ml-auto"
+          @click="clear" />
+      </span>
+    </b-datepicker>
   </script>
 
   <script src="https://unpkg.com/vue@2"></script>
