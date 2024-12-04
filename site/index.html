@@ -245,7 +245,7 @@
   <script type="text/x-template" id="subscription-renewal-date-picker-template">
     <b-datepicker ref="datepicker" v-model="computedDate" :mobile-native="false" position="is-bottom-left" append-to-body>
       <template #trigger="props">
-        <span class="tag is-rounded has-text-weight-normal">
+        <span class="tag is-rounded has-text-weight-normal is-light" :class="tagClasses">
           <template v-if="computedDate">
             <span>{{formattedDate}}</span>
             <b-icon icon="autorenew" size="is-small" v-if="computedAutoRenew"></b-icon>
@@ -289,6 +289,13 @@
 
     const db = getFirestore()
 
+    const objectMap = (obj, fn) =>
+      Object.fromEntries(
+        Object.entries(obj).map(
+          ([k, v], i) => [k, fn(v, k, i)]
+        )
+      )
+
     Vue.component('subscription-renewal-date-picker', {
       props: {
         value: Object
@@ -324,6 +331,26 @@
             month: "short",
             day: "numeric",
           })
+        },
+        tagClasses() {
+          // const classes = ["tag", "is-rounded", "has-text-weight-normal", "is-light"]
+          const classes = []
+
+          const now = new Date()
+          const nextWeek = new Date().setDate(now.getDate() + 7)
+
+          if (!this.date) {
+            return classes
+          }
+
+          if (this.date < now && !this.autoRenew) {
+            classes.push("is-danger")
+          }
+          else if (this.date < nextWeek) {
+            classes.push("is-warning")
+          }
+
+          return classes
         }
       },
       methods: {
@@ -385,6 +412,24 @@
         },
         isSubscribed(provider) {
           return this.subscribed.includes(provider)
+        },
+        loadUserPrefs(data) {
+          this.subscribed = data.subscribed
+          this.subscriptionRenewal = objectMap(data.subscriptionRenewal, renewal => ({
+            date: renewal?.date?.toDate() || null,
+            autoRenew: renewal?.autoRenew || false,
+          }))
+          this.subscriptionSplitCount = this.subscribed.length
+          this.sortStreamProviders()
+          this.processRenewals()
+        },
+        processRenewals() {
+          const now = new Date();
+          Object.entries(this.subscriptionRenewal).forEach(([provider, renewal]) => {
+            if (renewal.date && renewal.date < now && renewal.autoRenew) {
+              renewal.date = new Date(renewal.date.setMonth(renewal.date.getMonth() + 1))
+            }
+          })
         },
         sortStreamProviders() {
           if (!this.list.stream) {
@@ -457,19 +502,7 @@
                 setDoc(this.userPrefsRef(), {})
                 return
                }
-               const data = docSnapshot.data()
-               this.subscribed = data.subscribed
-               const subscriptionRenewal = {}
-               for (var p in data.subscriptionRenewal) {
-                 const renewal = data.subscriptionRenewal[p]
-                 subscriptionRenewal[p] = {
-                   date: renewal?.date?.toDate() || null,
-                   autoRenew: renewal?.autoRenew || false,
-                 }
-               }
-               this.subscriptionRenewal = subscriptionRenewal
-               this.subscriptionSplitCount = this.subscribed.length
-               this.sortStreamProviders()
+               this.loadUserPrefs(docSnapshot.data())
             })
         })
       }
