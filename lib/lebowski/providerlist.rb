@@ -21,6 +21,7 @@ module Lebowski
         "Paramount Plus",
         "Paramount+ Amazon Channel",
         "Paramount Plus Apple TV Channel",
+        "Paramount Plus Premium",
       ],
       "Hollywood Suite" => [
         "Hollywood Suite",

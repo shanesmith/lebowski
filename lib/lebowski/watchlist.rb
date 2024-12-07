@@ -6,6 +6,7 @@ module Lebowski
       "Club Illico",
       "iciTouTV",
       "Amazon Prime Video with Ads",
+      "Paramount Plus Basic with Ads",
     ]
 
     @watchlist = nil
