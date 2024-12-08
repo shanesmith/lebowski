@@ -368,6 +368,13 @@
           this.emitValue()
         }
       },
+      mounted() {
+        this.$nextTick(() => {
+          this.$el
+            .getElementsByClassName("background")[0]
+            .addEventListener('click', () => this.toggle(false))
+        })
+      }
     })
 
     window.app = new Vue({
