@@ -128,6 +128,7 @@
               </template>
 
               <b-dropdown-item @click="logout">Sign Out</b-dropdown-item>
+              <b-dropdown-item @click="traktLogin">TRAKT Auth ({{traktAuthExpires}})</b-dropdown-item>
             </b-dropdown>
           </div>
         </div>
@@ -273,6 +274,9 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js"
     import { getAuth, GoogleAuthProvider, signInWithPopup } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js'
     import { collection, doc, getDoc, setDoc, updateDoc, getFirestore } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js'
+    import Cookies from 'https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/+esm'
+
+    const TRAKT_CLIENT_ID = "bb3db3bd77462d92233e318c872ba30a8c056ec50400274b4011053042de5d8e"
 
     initializeApp({
       apiKey: "AIzaSyBMMF8xaGjf3_XEAKgtb7ROvuwEWrugmZU",
@@ -295,6 +299,32 @@
           ([k, v], i) => [k, fn(v, k, i)]
         )
       )
+
+    // https://docs.cotter.app/sdk-reference/api-for-other-mobile-apps/api-for-mobile-apps#step-1-create-a-code-verifier
+    function generateCodeVerifier() {
+      const dec2hex = (dec) => ("0" + dec.toString(16)).substr(-2)
+      const array = new Uint32Array(56 / 2)
+      window.crypto.getRandomValues(array)
+      return Array.from(array, dec2hex).join("")
+    }
+
+    function generateCodeChallengeFromVerifier(verifier) {
+      const data = new TextEncoder().encode(verifier)
+      return window.crypto.subtle.digest("SHA-256", data)
+        .then(hashed => {
+            const bytes = new Uint8Array(hashed)
+
+            let str = ""
+            for (let i = 0; i < bytes.byteLength; i++) {
+              str += String.fromCharCode(bytes[i])
+            }
+
+            return btoa(str)
+              .replace(/\+/g, "-")
+              .replace(/\//g, "_")
+              .replace(/=+$/, "")
+        })
+    }
 
     Vue.component('subscription-renewal-date-picker', {
       props: {
@@ -388,6 +418,17 @@
         subscribed: [],
         subscriptionSplitCount: null,
         subscriptionRenewal: {},
+        traktAuth: null,
+        waitForAuth: null,
+      },
+      computed: {
+        traktAuthExpires() {
+          if (!this.traktAuth) {
+            return null
+          }
+          const expiresOn = this.traktAuth.created_at + this.traktAuth.expires_in
+          return this.dateFormat(expiresOn * 1000)
+        }
       },
       methods: {
         timeFormat(time) {
@@ -420,6 +461,7 @@
           return this.subscribed.includes(provider)
         },
         loadUserPrefs(data) {
+          this.traktAuth = data.traktAuth
           this.subscribed = data.subscribed
           this.subscriptionRenewal = objectMap(data.subscriptionRenewal, renewal => ({
             date: renewal?.date?.toDate() || null,
@@ -458,6 +500,29 @@
               return bScore - aScore
             })
           }
+        },
+        traktLogin() {
+          // Trakt API does support PKCE OAuth
+          // https://github.com/trakt/api-help/issues/367
+
+          const state = generateCodeVerifier()
+          Cookies.set('trakt_auth_state', state)
+
+          const verifier = generateCodeVerifier()
+          Cookies.set('trakt_code_verifier', verifier)
+
+          generateCodeChallengeFromVerifier(verifier)
+            .then(challenge => {
+              const url = new URL("https://trakt.tv/oauth/authorize")
+              url.searchParams.append("response_type", "code")
+              url.searchParams.append("client_id", TRAKT_CLIENT_ID)
+              url.searchParams.append("code_challenge", challenge)
+              url.searchParams.append("code_challenge_method", "S256")
+              url.searchParams.append("state", state)
+              url.searchParams.append("redirect_uri", window.location.origin + window.location.pathname)
+
+              window.location = url.href
+          })
         }
       },
       watch: {
@@ -491,8 +556,15 @@
           .then(response => response.json())
           .then(json => this.lastUpdate = json[0].time)
 
+        const waitForAuthCallbacks = {}
+        this.waitForAuth = new Promise((resolve) => {
+          waitForAuthCallbacks.resolve = resolve
+        })
+
         auth.onAuthStateChanged(user => {
           this.user = user
+
+          waitForAuthCallbacks.resolve();
 
           if (!user) {
             this.subscribed = []
@@ -511,6 +583,40 @@
                this.loadUserPrefs(docSnapshot.data())
             })
         })
+
+        const params = new URLSearchParams(window.location.search);
+        const code = params.get('code')
+        const state = params.get('state')
+        if (code) {
+          params.delete('code')
+          params.delete('state')
+          history.replaceState(null, null, `?${params}`)
+
+          this.waitForAuth
+            .then(() => {
+              if (!this.user) {
+                throw new Error("User is not authed!")
+              }
+
+              if (state !== Cookies.get('trakt_auth_state')) {
+                throw new Error("Trakt state does not match!")
+              }
+
+              return fetch("https://api.trakt.tv/oauth/token", {
+                method: "POST",
+                headers: { 'Content-Type': "application/json" },
+                body: JSON.stringify({
+                  code: code,
+                  client_id: TRAKT_CLIENT_ID,
+                  code_verifier: Cookies.get('trakt_code_verifier'),
+                  grant_type: "authorization_code",
+                  redirect_uri: window.location.origin + window.location.pathname,
+                })
+              })
+            })
+            .then(response => response.json())
+            .then(json => updateDoc(this.userPrefsRef(), { traktAuth: json }))
+        }
       }
     })
   </script>
