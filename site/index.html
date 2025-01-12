@@ -274,6 +274,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js"
     import { getAuth, GoogleAuthProvider, signInWithPopup } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js'
     import { collection, doc, getDoc, setDoc, updateDoc, getFirestore } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js'
+    import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-functions.js'
     import Cookies from 'https://cdn.jsdelivr.net/npm/js-cookie@3.0.5/+esm'
 
     const TRAKT_CLIENT_ID = "bb3db3bd77462d92233e318c872ba30a8c056ec50400274b4011053042de5d8e"
@@ -292,6 +293,8 @@
     const provider = new GoogleAuthProvider()
 
     const db = getFirestore()
+
+    const functions = getFunctions()
 
     const objectMap = (obj, fn) =>
       Object.fromEntries(
@@ -579,6 +582,8 @@
           this.user = user
 
           waitForAuthCallbacks.resolve();
+
+          httpsCallable(functions, 'doTheThing')().then((result) => console.log(result))
 
           if (!user) {
             this.subscribed = []
