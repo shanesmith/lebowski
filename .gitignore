@@ -1,2 +1,5 @@
 .env
 site/data/*
+
+firebase-debug.log
+firebase-debug.*.log
