@@ -1,34 +1,33 @@
-const {onCall, HttpsError} = require("firebase-functions/v2/https");
-const {initializeApp} = require("firebase-admin/app");
-const {getFirestore} = require("firebase-admin/firestore");
-// const logger = require("firebase-functions/logger");
+import {onSchedule} from "firebase-functions/v2/scheduler";
+import {initializeApp} from "firebase-admin/app";
+import {defineSecret} from "firebase-functions/params";
+
+import User from "./lib/user.js";
+import TraktClient from "./lib/trakt.js";
+
+const traktClientId = defineSecret("TRAKT_CLIENT_ID");
+const traktClientSecret = defineSecret("TRAKT_CLIENT_SECRET");
 
 initializeApp();
 
-function requireAuth(request) {
-  if (request.auth) {
-    return;
-  }
-
-  throw new HttpsError("unauthenticated");
-}
-
-async function getUserPrefs(request) {
-  requireAuth(request);
-
-  const snapshot = await getFirestore()
-      .doc(`users/${request.auth.uid}`)
-      .get();
-
-  if (!snapshot.exists) {
-    return new HttpsError("not-found");
-  }
-
-  return snapshot.data();
+function getTraktClient() {
+  return new TraktClient(
+      traktClientId.value(),
+      traktClientSecret.value(),
+  );
 }
 
 // TODO set CORS
-exports.doTheThing = onCall(async (request) => {
-  const prefs = await getUserPrefs(request);
-  return prefs;
-});
+export const countTheThings = onSchedule(
+    {
+      schedule: "0 21 * * *", // 9pm UTC
+      secrets: [traktClientId, traktClientSecret],
+    },
+    async () => {
+      const userList = await User.getAll(getTraktClient());
+      userList.forEach(async (user) => {
+        const watchlist = await user.getWatchlist();
+        user.updatePrefs({watchlistCount: watchlist.length});
+      });
+    },
+);

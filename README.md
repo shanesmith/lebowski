@@ -12,8 +12,17 @@ the [TMDB API][3]. The resulting data is processed and dumped in a JSON file.
 The workflow then publishes this JSON file to Github Pages together with a
 simple Vue.js based webapp for viewing.
 
+### Development
+
+```
+$ nodenv install
+$ npm install -g firebase-tools
+$ firebase login
+$ firebase emulator:start
+$ firebase deploy
+```
+
 [1]: https://trakt.tv/users/shanesmith/watchlist?display=movie&sort=added,asc
 [2]: https://trakt.docs.apiary.io/#reference/users/watchlist
 [3]: https://developer.themoviedb.org/reference/movie-watch-providers
 [4]: https://www.justwatch.com
-
