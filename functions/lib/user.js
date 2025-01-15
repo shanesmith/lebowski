@@ -1,7 +1,7 @@
 import {HttpsError} from "firebase-functions/v2/https";
 import {getFirestore} from "firebase-admin/firestore";
 
-export default class User {
+export class User {
   constructor(uid, traktClient) {
     this.uid = uid;
     this.traktClient = traktClient;

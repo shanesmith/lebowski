@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export default class TraktClient {
+export class TraktClient {
   constructor(clientId, _clientSecret) {
     this.client = axios.create({
       baseURL: "https://api.trakt.tv",

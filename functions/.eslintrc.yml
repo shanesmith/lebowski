@@ -16,6 +16,7 @@
     "prefer-arrow-callback": "error",
     "quotes": ["error", "double", {"allowTemplateLiterals": true}],
     "require-jsdoc": "off",
+    "max-len": ["warn", {code: 100, ignoreComments: true}],
   },
   overrides: [
     {
