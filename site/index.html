@@ -410,7 +410,7 @@
     window.app = new Vue({
       el: '#app',
       data: {
-        list: {},
+        raw_list: {},
         isOpen: "",
         otherTypes: ["rent", "buy", "unavailable"],
         lastUpdate: null,
@@ -428,6 +428,44 @@
           }
           const expiresOn = this.traktAuth.created_at + this.traktAuth.expires_in
           return this.dateFormat(expiresOn * 1000)
+        },
+        list() {
+          const streamSort = (a, b) => {
+            var aScore = a.movies.length
+            var bScore = b.movies.length
+
+            if (this.isSubscribed(this.providerKey(a))) {
+              aScore += 100
+            }
+            if (this.isSubscribed(this.providerKey(b))) {
+              bScore += 100
+            }
+
+            return bScore - aScore
+          }
+
+          const emptyProvider = (p) => ({
+            provider: p,
+            movies: [],
+            subscribed: true,
+            group: null
+          })
+
+          const providerMatch = (p, s) => {
+            if (p.endsWith("-group")) {
+              return s.provider === p.slice(0, -6) && s.group !== null
+            }
+
+            return s.provider === p
+          }
+
+          const subscribedProvidersWithNoMovies = this.subscribed.filter(p => ! this.raw_list?.stream?.some(s => providerMatch(p, s)) ).map(emptyProvider)
+          const raw_streams = this.raw_list?.stream ?? []
+
+          return {
+            ...this.raw_list,
+            stream: raw_streams.concat(subscribedProvidersWithNoMovies).sort(streamSort)
+          }
         }
       },
       methods: {
@@ -468,7 +506,6 @@
             autoRenew: renewal?.autoRenew || false,
           }))
           this.subscriptionSplitCount = this.subscribed.length
-          this.sortStreamProviders()
           this.processRenewals()
         },
         processRenewals() {
@@ -478,28 +515,6 @@
               renewal.date = new Date(renewal.date.setMonth(renewal.date.getMonth() + 1))
             }
           })
-        },
-        sortStreamProviders() {
-          if (!this.list.stream) {
-            return
-          }
-
-          this.list = {
-            ...this.list,
-            stream: this.list.stream.sort((a, b) => {
-              var aScore = a.movies.length
-              var bScore = b.movies.length
-
-              if (this.isSubscribed(this.providerKey(a))) {
-                aScore += 100
-              }
-              if (this.isSubscribed(this.providerKey(b))) {
-                bScore += 100
-              }
-
-              return bScore - aScore
-            })
-          }
         },
         traktLogin() {
           // Trakt API does support PKCE OAuth
@@ -549,8 +564,7 @@
       created: function() {
         fetch("./data/providerlist.json")
           .then(response => response.json())
-          .then(json => this.list = json)
-          .then(() => this.sortStreamProviders())
+          .then(json => this.raw_list = json)
 
         fetch("./data/updates-watchlist.json")
           .then(response => response.json())
@@ -570,7 +584,6 @@
             this.subscribed = []
             this.subscriptionRenewal = {}
             this.subscriptionSplitCount = 0
-            this.sortStreamProviders()
             return
           }
 
