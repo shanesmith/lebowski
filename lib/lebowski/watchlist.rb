@@ -2,6 +2,7 @@ module Lebowski
   class Watchlist
     IGNORE_PROVIDERS = [
       "Netflix basic with Ads",
+      "Netflix Standard with Ads",
       "Hoopla",
       "Club Illico",
       "iciTouTV",
