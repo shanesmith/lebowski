@@ -30,6 +30,18 @@ jobs:
         with:
           path: site/
 
+      - shell: bash
+        run: |
+          response=$(curl --show-error -H 'Content-Type: application/json' -H 'trakt-api-version: 2' -H "trakt-api-key: ${TRAKT_CLIENT_ID}" --silent -X POST --data "{\"refresh_token\":\"${TRAKT_REFRESH_TOKEN}\",\"client_id\":\"${TRAKT_CLIENT_ID}\",\"client_secret\":\"${TRAKT_CLIENT_SECRET}\",\"grant_type\":\"refresh_token\"}" https://api.trakt.tv/oauth/token)
+          gh secret set TRAKT_REFRESH_TOKEN --body "$(jq -r .refresh_token <<<"$response")"
+          gh secret set TRAKT_ACCESS_TOKEN --body "$(jq -r .access_token <<<"$response")"
+        env:
+          TRAKT_CLIENT_ID: ${{secrets.TRAKT_CLIENT_ID}}
+          TRAKT_CLIENT_SECRET: ${{secrets.TRAKT_CLIENT_SECRET}}
+          TRAKT_ACCESS_TOKEN: ${{secrets.TRAKT_ACCESS_TOKEN}}
+          TRAKT_REFRESH_TOKEN: ${{secrets.TRAKT_REFRESH_TOKEN}}
+          GH_TOKEN: ${{secrets.GH_SECRETS_UPDATE_TOKEN}}
+
   deploy:
     needs: build
     if: github.ref == 'refs/heads/main'
