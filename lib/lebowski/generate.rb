@@ -32,7 +32,7 @@ module Lebowski
       end
 
       def watchlist
-        @watchlist ||= Lebowski::Watchlist.fetch(with_providers: true)
+        @watchlist ||= Lebowski::Watchlist.fetch(with_providers: true, with_people: true)
       end
 
       def providerlist

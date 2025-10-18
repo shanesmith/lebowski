@@ -94,7 +94,10 @@ module Lebowski
 
         item = {
           **movie["movie"],
-          "link" => "https://www.themoviedb.org/movie/#{movie.dig("movie", "ids", "tmdb")}/watch?locale=CA",
+          "link" => {
+            "tmdb" => "https://www.themoviedb.org/movie/#{movie.dig("movie", "ids", "tmdb")}/watch?locale=CA",
+            "trakt" => "https://trakt.tv/movies/#{movie.dig("movie", "ids", "slug")}",
+          }
         }
 
         if list.empty?

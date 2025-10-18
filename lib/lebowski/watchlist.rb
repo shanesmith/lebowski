@@ -13,8 +13,9 @@ module Lebowski
     @watchlist = nil
 
     class << self
-      def fetch(with_providers: false)
+      def fetch(with_providers: false, with_people: false)
         watchlist = Watchlist.new(Lebowski::Trakt.watchlist)
+        watchlist.fetch_people if with_people
         watchlist.fetch_providers if with_providers
         watchlist
       end
@@ -40,9 +41,17 @@ module Lebowski
 
         flatrate = movie.dig("providers", "flatrate")
         unless flatrate.nil?
-          flatrate.reject! { |p| IGNORE_PROVIDERS.include?(p["provider_name"])}
+          flatrate.reject! { |p| IGNORE_PROVIDERS.include?(p["provider_name"]) }
           movie["providers"].delete("flatrate") if flatrate.empty?
         end
+      end
+    end
+
+    def fetch_people
+      @watchlist.each_with_index do |movie, index|
+        id = movie.dig('movie', 'ids', 'trakt')
+
+        movie["movie"]["people"] = Lebowski::Trakt.people(id)
       end
     end
 

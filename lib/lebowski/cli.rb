@@ -22,10 +22,14 @@ module Lebowski
 
     desc 'watchlist', 'Show watchlist'
     option :'with-providers', :type => :boolean
+    option :'with-people', :type => :boolean
     option :pretty, :type => :boolean
     def watchlist
       puts Lebowski::Watchlist
-        .fetch(with_providers: options[:'with-providers'])
+        .fetch(
+          with_providers: options[:'with-providers'],
+          with_people: options[:'with-people']
+        )
         .to_json(pretty: options[:pretty])
     end
 

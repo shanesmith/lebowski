@@ -180,17 +180,7 @@
           <div class="card-content content">
             <ul class="mt-0 movies">
               <li v-for="movie in provider.movies">
-                <a :href="movie.link" target="_blank">
-                  {{movie.title}}
-                  <span class="has-text-grey has-text-weight-light is-size-7">({{movie.year}})</span>
-                </a>
-                <b-tooltip
-                  v-if="movie.other_providers.length != 0"
-                  :label="movie.other_providers.join(' / ')"
-                  position="is-right"
-                  type="is-light">
-                  <span class="tag is-rounded">{{movie.other_providers.length}}</span>
-                </b-tooltip>
+                <movie-link :movie="movie"></movie-link>
               </li>
             </ul>
           </div>
@@ -220,10 +210,7 @@
           <div class="card-content content">
             <ul class="mt-0 movies">
               <li v-for="movie in list[type]">
-                <a :href="movie.link" target="_blank">
-                  {{movie.title}}
-                  <span class="has-text-grey has-text-weight-light is-size-7">({{movie.year}})</span>
-                </a>
+                <movie-link :movie="movie"></movie-link>
               </li>
             </ul>
           </div>
@@ -242,6 +229,37 @@
     </footer>
 
   </div>
+
+  <script type="text/x-template" id="movie-link-template">
+    <div>
+      <a @click="isModalActive = true">
+        {{movie.title}}
+        <span class="has-text-grey has-text-weight-light is-size-7">{{movie.year}}</span>
+      </a>
+      <b-tooltip
+        v-if="movie.other_providers && movie.other_providers.length != 0"
+        :label="movie.other_providers.join(' / ')"
+        position="is-right"
+        type="is-light">
+        <span class="tag is-rounded">{{movie.other_providers.length}}</span>
+      </b-tooltip>
+      <b-modal
+        v-model="isModalActive">
+        <div class="box">
+          <div class="title is-3">
+            {{movie.title}}
+            <span class="has-text-grey has-text-weight-light is-size-5">{{movie.year}} / {{director}} / {{movie.runtime}} minutes</span>
+          </div>
+          <p>{{movie.overview}}</p>
+          <p>
+            <a :href="movie.link.tmdb" target="_blank">TMDB</a>
+            -
+            <a :href="movie.link.trakt" target="_blank">TRAKT</a>
+          </p>
+        </div>
+      </b-modal>
+    </div>
+  </script>
 
   <script type="text/x-template" id="subscription-renewal-date-picker-template">
     <b-datepicker ref="datepicker" v-model="computedDate" :mobile-native="false" position="is-bottom-left" append-to-body>
@@ -325,6 +343,25 @@
               .replace(/=+$/, "")
         })
     }
+
+    Vue.component('movie-link', {
+      props: {
+        movie: Object
+      },
+      data() {
+        return {
+          isModalActive: false
+        }
+      },
+      template: '#movie-link-template',
+      computed: {
+        director() {
+          return this.movie.people.crew.directing
+            .filter(p => p.job === "Director")
+            .map(p => p.person.name).join(", ")
+        }
+      }
+    })
 
     Vue.component('subscription-renewal-date-picker', {
       props: {
