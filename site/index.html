@@ -252,11 +252,14 @@
           <div class="subtitle has-text-grey has-text-weight-light">
             {{director}} / {{movie.year}} / {{movie.runtime}} minutes
           </div>
-          <p>{{movie.overview}}</p>
-          <p>
-            <a :href="movie.link.tmdb" target="_blank" class="button is-link is-outlined">TMDB</a>
-            <a :href="movie.link.trakt" target="_blank" class="button is-link is-outlined">TRAKT</a>
-          </p>
+          <div class="is-clearfix">
+            <img :src="movie.poster_image" class="is-pulled-left mr-5" />
+            <p>{{movie.overview}}</p>
+            <div class="buttons">
+              <a :href="movie.link.tmdb" target="_blank" class="button is-link is-outlined">TMDB</a>
+              <a :href="movie.link.trakt" target="_blank" class="button is-link is-outlined">TRAKT</a>
+            </div>
+          </div>
         </div>
       </b-modal>
     </div>

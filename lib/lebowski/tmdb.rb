@@ -39,6 +39,10 @@ module Lebowski
         conn.get("/3/movie/#{id}/watch/providers").body.dig("results", "CA")
       end
 
+      def movie(id)
+        conn.get("/3/movie/#{id}", {append_to_response: "watch/providers"}).body
+      end
+
       def conn
         @conn ||= Faraday.new("https://api.themoviedb.org") do |conn|
           conn.request :authorization, 'Bearer', ACCESS_TOKEN

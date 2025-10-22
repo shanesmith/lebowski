@@ -37,7 +37,11 @@ module Lebowski
           next
         end
 
-        movie["providers"] = Lebowski::TMDB.providers(id)
+        tmdb_movie = Lebowski::TMDB.movie(id)
+
+        movie["movie"]["poster_image"] = "http://image.tmdb.org/t/p/w185" + tmdb_movie["poster_path"]
+
+        movie["providers"] = tmdb_movie.dig("watch/providers", "results", "CA")
 
         flatrate = movie.dig("providers", "flatrate")
         unless flatrate.nil?
