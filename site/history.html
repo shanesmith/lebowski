@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Lebowski</title>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- https://favicon.io -->
+  <link rel="apple-touch-icon" sizes="180x180" href="assets/favicon/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon/favicon-16x16.png">
+  <link rel="manifest" href="site.webmanifest">
+
+  <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@mdi/font@5.8.55/css/materialdesignicons.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/buefy@0.9/dist/buefy.min.css">
+  <style>
+    .page-header .title {
+      font-size: 4rem;
+
+      font-family: "Abril Fatface", serif;
+      font-weight: normal;
+    }
+
+    #the_dude {
+      will-change: transform;
+    }
+
+    #the_dude:hover {
+      animation: wiggle 0.4s linear infinite;
+    }
+
+    @keyframes wiggle {
+      0% { transform: rotate(0deg); }
+      25% { transform: rotate(-15deg); }
+      50% { transform: rotate(0deg); }
+      75% { transform: rotate(10deg); }
+      100% { transform: rotate(0deg); }
+    }
+
+    .movies {
+      display: flex;
+      flex-wrap: wrap;
+      margin-left: 0 !important;
+    }
+
+    .movies > li {
+      flex: 1 1 44%;
+      margin-left: 2em;
+    }
+
+    .card {
+      border: 1px solid transparent;
+    }
+
+    .card:hover {
+      border-left: 1px solid #959595;
+    }
+
+    .card .card-header {
+      box-shadow: none;
+    }
+
+    .card.opened {
+      border: 1px solid #959595;
+    }
+
+    a.has-text-grey:hover {
+      color: #7957d5 !important;
+    }
+
+    .subscriptionSplit {
+      margin-top: 2em;
+    }
+
+    .subscribed-star {
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .card:hover .subscribed-star,
+    .card.opened .subscribed-star,
+    .subscribed-star:has(input[type=checkbox]:checked) {
+      visibility: visible;
+      pointer-events: auto;
+      margin-right: 0;
+    }
+
+    .checkbox.subscribed-star .check {
+      display: none;
+    }
+
+    .checkbox.subscribed-star .control-label {
+      padding-left: 0;
+    }
+
+    .subscribed-star:hover {
+       text-shadow: 0 0 2px #aaa;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="app">
+
+    <section class="section page-header">
+
+      <div class="container is-max-desktop is-flex is-align-items-start is-flex-wrap-wrap-reverse">
+        <div class="is-flex is-align-items-center">
+          <img src="assets/the_dude.png" id="the_dude" />
+          <div>
+            <h1 class="title ml-5">Lebowski</h1>
+            <h2 class="subtitle ml-5">Where's the movies, Lebowski?</h2>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <section class="section pt-4">
+      <div class="container is-max-desktop">
+        <div class="pb-2" style="margin-top: -1.5rem;">
+          <a href="./"  class="has-text-grey">&laquo; back</a>
+        </div>
+      </div>
+      <div class="container">
+        <b-table :data="monthTableData" :columns="monthColumns"></b-table>
+        <b-table :data="weekTableData" :columns="weekColumns"></b-table>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div class="container is-max-desktop has-text-centered">
+        <a href="https://github.com/shanesmith/lebowski" class="is-flex is-align-items-center is-justify-content-center">
+          <b-icon icon="github" class="mr-2 has-text-black"></b-icon>
+          https://github.com/shanesmith/lebowski
+        </a>
+        <a href="https://github.com/shanesmith/lebowski/actions/workflows/page.yml">
+          <img class="mt-5" src="https://github.com/shanesmith/lebowski/actions/workflows/page.yml/badge.svg" />
+        </a>
+      </div>
+    </footer>
+
+  </div>
+
+  <script src="https://unpkg.com/vue@2"></script>
+  <script src="https://unpkg.com/buefy@0.9/dist/buefy.min.js"></script>
+  <script type="module">
+    function mondayOfWeek(date) {
+        const d = new Date(date);
+        const day = d.getDay();
+        const daysBack = (day + 6) % 7; // Mon->0, Tue->1, Sun->6
+        d.setDate(d.getDate() - daysBack);
+        d.setHours(0, 0, 0, 0)
+        return d;
+    }
+
+    window.app = new Vue({
+      el: '#app',
+      data: {
+        history: [],
+        weekColumns: [
+            {
+                field: 'week',
+                label: 'Week',
+            },
+            {
+                field: 'count',
+                label: 'Count',
+            }
+        ],
+        monthColumns: [
+            {
+                field: 'month',
+                label: 'Month',
+            },
+            {
+                field: 'count',
+                label: 'Count',
+            }
+        ]
+      },
+      computed: {
+        weekGrouped() {
+            return this.history
+                .reduce(
+                    (result, entry) => {
+                        const watched = new Date(entry.last_watched_at)
+                        const key = mondayOfWeek(watched).getTime()
+                        if (!result[key]) {
+                            result[key] = []
+                        }
+                        result[key].push(entry)
+                        return result
+                    },
+                    {}
+                )
+        },
+        weekGroupedKeys() {
+            return Object.keys(this.weekGrouped)
+                .sort((a, b) => Number(a) - Number(b))
+                .reverse()
+        },
+        weekTableData() {
+            return this.weekGroupedKeys.map((timestamp) => {
+                const week = new Date(Number(timestamp)).toLocaleString(undefined, {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                })
+                return {
+                    week: week,
+                    // week: new Date(Number(timestamp)).toString(),
+                    // week: timestamp,
+                    count: this.weekGrouped[timestamp].length
+                }
+            })
+        },
+        monthGrouped() {
+            return this.history
+                .reduce(
+                    (result, entry) => {
+                        const watched = new Date(entry.last_watched_at)
+                        watched.setDate(1)
+                        watched.setHours(0, 0, 0, 0)
+                        const key = watched.getTime()
+                        if (!result[key]) {
+                            result[key] = []
+                        }
+                        result[key].push(entry)
+                        return result
+                    },
+                    {}
+                )
+        },
+        monthGroupedKeys() {
+            return Object.keys(this.monthGrouped)
+                .sort((a, b) => Number(a) - Number(b))
+                .reverse()
+        },
+        monthTableData() {
+            return this.monthGroupedKeys.map((timestamp) => {
+                const month = new Date(Number(timestamp)).toLocaleString(undefined, {
+                    month: "short",
+                    year: "numeric",
+                })
+                return {
+                    month: month,
+                    count: this.monthGrouped[timestamp].length
+                }
+            })
+        },
+      },
+      created: function() {
+        fetch("./data/history.json")
+            .then(response => response.json())
+            .then(json => this.history = json)
+      }
+    })
+  </script>
+</body>
+</html>

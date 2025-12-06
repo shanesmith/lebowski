@@ -8,6 +8,7 @@ require 'lebowski/utils'
 require 'lebowski/generate'
 require 'lebowski/watchlist'
 require 'lebowski/providerlist'
+require 'lebowski/history'
 
 module Lebowski
 end

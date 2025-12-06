@@ -11,6 +11,7 @@ module Lebowski
     OLD_WATCHLIST_PATH = "data/old-watchlist.json"
     UPDATES_WATCHLIST_PATH = "data/updates-watchlist.json"
     PROVIDERLIST_PATH = "data/providerlist.json"
+    HISTORY_PATH = "data/history.json"
 
     class << self
       def run
@@ -29,6 +30,7 @@ module Lebowski
         File.write(site_path(PROVIDERLIST_PATH), providerlist.to_json(pretty: true))
         File.write(site_path(OLD_WATCHLIST_PATH), old_watchlist.to_json(pretty: true))
         File.write(site_path(UPDATES_WATCHLIST_PATH), JSON.pretty_generate(updates_watchlist))
+        File.write(site_path(HISTORY_PATH), history.to_json(pretty: true))
       end
 
       def watchlist
@@ -45,6 +47,10 @@ module Lebowski
 
       def old_watchlist
         @old_watchlist ||= Lebowski::Watchlist.new(fetch(WATCHLIST_PATH, default: []))
+      end
+
+      def history
+        @history ||= Lebowski::History.fetch
       end
 
       def fetch(path, default: nil)

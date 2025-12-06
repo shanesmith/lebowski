@@ -42,6 +42,12 @@ module Lebowski
         .to_json(pretty: options[:pretty])
     end
 
+    desc 'history', 'Show watched movie history with timestamps'
+    option :pretty, :type => :boolean
+    def history
+      puts Lebowski::History.fetch.to_json(pretty: options[:pretty])
+    end
+
     desc 'generate', 'Generate'
     def generate
       Lebowski::Generate.run

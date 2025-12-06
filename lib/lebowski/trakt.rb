@@ -31,6 +31,62 @@ module Lebowski
         conn.get("/movies/#{id}/people").body
       end
 
+      # [{
+      #   "last_updated_at": "2025-12-04T04:23:00.000Z",
+      #   "last_watched_at": "2025-12-04T04:23:02.000Z",
+      #   "movie": {
+      #     "ids": {
+      #       "imdb": "tt0112817",
+      #       "plex": {
+      #         "guid": "5d7768284de0ee001fcc8f50",
+      #         "slug": "dead-man"
+      #       },
+      #       "slug": "dead-man-1995",
+      #       "tmdb": 922,
+      #       "trakt": 764
+      #     },
+      #     "year": 1995,
+      #     "title": "Dead Man",
+      #     "votes": 2042,
+      #     "colors": {
+      #       "poster": ["#DADADA", "#272525"]
+      #     },
+      #     "genres": ["drama", "fantasy", "western"],
+      #     "images": {
+      #       "logo": ["media.trakt.tv/images/movies/000/000/764/logos/medium/1da33ecf9f.png.webp"],
+      #       "thumb": ["media.trakt.tv/images/movies/000/000/764/thumbs/medium/c3f49f6b33.jpg.webp"],
+      #       "banner": ["media.trakt.tv/images/movies/000/000/764/banners/medium/87c5877261.jpg.webp"],
+      #       "fanart": ["media.trakt.tv/images/movies/000/000/764/fanarts/medium/c793b5d232.jpg.webp"],
+      #       "poster": ["media.trakt.tv/images/movies/000/000/764/posters/medium/b11d5fd641.jpg.webp"],
+      #       "clearart": []
+      #     },
+      #     "rating": 7.2575907707214355,
+      #     "status": "released",
+      #     "country": "us",
+      #     "runtime": 121,
+      #     "tagline": "It is preferable not to travel with a dead man.",
+      #     "trailer": "https://youtube.com/watch?v=FEHMWguT--U",
+      #     "homepage": null,
+      #     "language": "en",
+      #     "overview": "On the run after committing murder, an accountant encounters a strange Native American man who prepares him for his journey into the spiritual world.",
+      #     "released": "1996-05-05",
+      #     "languages": ["en", "cr"],
+      #     "subgenres": ["19th-century", "murder", "black-and-white", "sheriff", "bounty-hunter", "frontier"],
+      #     "updated_at": "2025-12-05T16:23:26.000Z",
+      #     "after_credits": false,
+      #     "certification": "R",
+      #     "comment_count": 6,
+      #     "during_credits": false,
+      #     "original_title": "Dead Man",
+      #     "available_translations": ["bg", "ca", "cs", "da", "de", "el", "en", "es", "fi", "fr", "he", "hu", "it", "ja", "ka", "ko", "lt", "nl", "no", "pl", "pt", "ru", "sk", "sv", "tr", "uk", "zh"]
+      #   },
+      #   "plays": 1,
+      #   "total_count": 479
+      # }, {
+      def history
+        conn.get("/users/me/watched/movies").body
+      end
+
       def conn
         @conn ||= Faraday.new("https://api.trakt.tv") do |conn|
           conn.headers['trakt-api-key'] = CLIENT_ID
