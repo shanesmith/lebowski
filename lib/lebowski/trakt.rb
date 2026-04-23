@@ -24,7 +24,7 @@ module Lebowski
       #         "imdb"=>"tt12818328",
       #         "tmdb"=>1019939}}},
       def watchlist
-        conn.get("/users/me/watchlist/movies/added", { extended: "full" }).body
+        conn.get("/users/me/watchlist/movies/added", { extended: "full", page: "1", limit: "1000" }).body
       end
 
       def people(id)
