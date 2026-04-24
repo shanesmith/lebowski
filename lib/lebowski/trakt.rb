@@ -24,7 +24,7 @@ module Lebowski
       #         "imdb"=>"tt12818328",
       #         "tmdb"=>1019939}}},
       def watchlist
-        conn.get("/users/me/watchlist/movies/added", { extended: "full", page: "1", limit: "1000" }).body
+        conn.get("/users/me/watchlist/movies/added", { extended: "full", limit: "250" }).body
       end
 
       def people(id)
@@ -95,10 +95,40 @@ module Lebowski
           conn.request :authorization, 'Bearer', ACCESS_TOKEN
           conn.request :json
 
+          conn.use Lebowski::Trakt::Pagination
+
           conn.response :json
           conn.response :raise_error
         end
       end
     end
+
+    class Pagination < ::Faraday::Middleware
+      def call(env)
+        response = @app.call(env)
+
+        response.on_complete do |res_env|
+          page_count = res_env.response_headers['X-Pagination-Page-Count'].to_i
+          next if page_count <= 1
+
+          encoder = env.params_encoder || ::Faraday::FlatParamsEncoder
+
+          (2..page_count).each do |page|
+            paged_env = env.dup
+            paged_env.url = env.url.dup
+
+            params = encoder.decode(paged_env.url.query.to_s)
+            params['page'] = page.to_s
+            paged_env.url.query = encoder.encode(params)
+
+            paged_response = @app.call(paged_env)
+            res_env.body.concat(paged_response.body)
+          end
+        end
+
+        response
+      end
+    end
+
   end
 end
