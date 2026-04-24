@@ -24,7 +24,7 @@ module Lebowski
       #         "imdb"=>"tt12818328",
       #         "tmdb"=>1019939}}},
       def watchlist
-        conn.get("/users/me/watchlist/movies/added", { extended: "full", limit: "250" }).body
+        conn.get("/users/me/watchlist/movies/added", { extended: "full", limit: "1000" }).body
       end
 
       def people(id)
@@ -95,7 +95,7 @@ module Lebowski
           conn.request :authorization, 'Bearer', ACCESS_TOKEN
           conn.request :json
 
-          conn.use Lebowski::Trakt::Pagination
+          # conn.use Lebowski::Trakt::Pagination
 
           conn.response :json
           conn.response :raise_error
@@ -103,6 +103,7 @@ module Lebowski
       end
     end
 
+    # borked
     class Pagination < ::Faraday::Middleware
       def call(env)
         response = @app.call(env)
