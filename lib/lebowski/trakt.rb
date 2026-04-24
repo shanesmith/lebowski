@@ -108,21 +108,22 @@ module Lebowski
         response = @app.call(env)
 
         response.on_complete do |res_env|
+          current_page = res_env.response_headers['X-Pagination-Page'].to_i
           page_count = res_env.response_headers['X-Pagination-Page-Count'].to_i
-          next if page_count <= 1
+          next if current_page >= page_count
 
           encoder = env.params_encoder || ::Faraday::FlatParamsEncoder
 
-          (2..page_count).each do |page|
-            paged_env = env.dup
-            paged_env.url = env.url.dup
+          paged_env = env.dup
+          paged_env.url = env.url.dup
 
-            params = encoder.decode(paged_env.url.query.to_s)
-            params['page'] = page.to_s
-            paged_env.url.query = encoder.encode(params)
+          params = encoder.decode(paged_env.url.query.to_s)
+          params['page'] = (current_page + 1).to_s
+          paged_env.url.query = encoder.encode(params)
 
-            paged_response = @app.call(paged_env)
-            res_env.body.concat(paged_response.body)
+          paged_response = call(paged_env)
+          paged_response.on_complete do |paged_res_env|
+            res_env.body.concat(paged_res_env.body)
           end
         end
 
