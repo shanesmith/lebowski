@@ -13,6 +13,9 @@ module Lebowski
     PROVIDERLIST_PATH = "data/providerlist.json"
     HISTORY_PATH = "data/history.json"
 
+    # 3 months
+    UPDATES_MAX_LIFE = 3 * 60 * 60 * 24 * 30
+
     class << self
       def run
         unless old_watchlist.value.empty?
@@ -24,6 +27,11 @@ module Lebowski
               "updates" => new_updates.value,
             })
           end
+        end
+
+        updates_watchlist.reject! do |item|
+          diff = Time.now - Time.parse(item['time'])
+          diff > UPDATES_MAX_LIFE
         end
 
         File.write(site_path(WATCHLIST_PATH), watchlist.to_json(pretty: true))
