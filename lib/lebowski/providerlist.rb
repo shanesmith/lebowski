@@ -122,24 +122,25 @@ module Lebowski
         end
       end
 
-      GROUP.each do |name,members|
-        name = "*#{name}"
-        result[name] = []
+      GROUP.each do |name, members|
+        star_name = "*#{name}"
+        result[star_name] = []
         members.each do |m|
           other_members = members.dup.tap { |a| a.delete(m) }
           if result[m].nil?
-            STDERR.puts "No such provider: #{m}"
+            GROUP[name].delete(m)
+            STDERR.puts "No such provider '#{m}' for group '#{name}'"
             next
           end
           common_movies = result[m].select do |movie|
             other_members.difference(movie["other_providers"]).empty?
           end
           common_movies.each { |movie| movie["other_providers"] -= members }
-          result[name] += common_movies
+          result[star_name] += common_movies
           result[m] -= common_movies
           result.delete(m) if result[m].empty?
         end
-        result[name].uniq!
+        result[star_name].uniq!
       end
 
       result = result
