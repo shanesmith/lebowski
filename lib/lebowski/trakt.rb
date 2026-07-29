@@ -24,7 +24,15 @@ module Lebowski
       #         "imdb"=>"tt12818328",
       #         "tmdb"=>1019939}}},
       def watchlist
-        conn.get("/users/me/watchlist/movies/added", { extended: "full", limit: "1000" }).body
+        page = 1
+        result = []
+        loop do
+          response = conn.get("/users/me/watchlist/movies/added", { limit: 250, page: page })
+          break if response.body.empty?
+          result += response.body
+          page += 1
+        end
+        result
       end
 
       def people(id)
@@ -102,35 +110,5 @@ module Lebowski
         end
       end
     end
-
-    # borked
-    class Pagination < ::Faraday::Middleware
-      def call(env)
-        response = @app.call(env)
-
-        response.on_complete do |res_env|
-          current_page = res_env.response_headers['X-Pagination-Page'].to_i
-          page_count = res_env.response_headers['X-Pagination-Page-Count'].to_i
-          next if current_page >= page_count
-
-          encoder = env.params_encoder || ::Faraday::FlatParamsEncoder
-
-          paged_env = env.dup
-          paged_env.url = env.url.dup
-
-          params = encoder.decode(paged_env.url.query.to_s)
-          params['page'] = (current_page + 1).to_s
-          paged_env.url.query = encoder.encode(params)
-
-          paged_response = call(paged_env)
-          paged_response.on_complete do |paged_res_env|
-            res_env.body.concat(paged_res_env.body)
-          end
-        end
-
-        response
-      end
-    end
-
   end
 end
