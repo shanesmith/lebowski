@@ -27,7 +27,7 @@ module Lebowski
         page = 1
         result = []
         loop do
-          response = conn.get("/users/me/watchlist/movies/added", { limit: 250, page: page })
+          response = conn.get("/users/me/watchlist/movies/added", { limit: 250, page: page, extended: "full" })
           break if response.body.empty?
           result += response.body
           page += 1
