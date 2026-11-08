@@ -17,7 +17,20 @@ client_id: $TRAKT_CLIENT_ID
 client_secret: $TRAKT_CLIENT_SECRET
 
 --
-GET /users/me/watchlist/movies/added
+POST /oauth/token
+refresh_token: $TRAKT_REFRESH_TOKEN
+client_id: $TRAKT_CLIENT_ID
+client_secret: $TRAKT_CLIENT_SECRET
+grant_type: refresh_token
+
+--
+GET /users/me/watchlist/movies/added?extended=full
 
 --
 GET /users/me/watched/movies
+
+--
+GET /sync/watched/movies
+
+---
+GET /sync/history/movies

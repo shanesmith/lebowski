@@ -6,4 +6,10 @@ Authorization: Bearer $TMDB_ACCESS_TOKEN
 --
 
 --
-GET /movie/115/watch/providers
+GET /configuration
+
+--
+GET /movie/940721/watch/providers
+
+--
+GET /movie/940721?append_to_response=watch/providers
